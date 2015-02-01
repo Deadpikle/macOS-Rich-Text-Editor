@@ -1,6 +1,6 @@
 RichTextEditor-iOS
 ==================
--Forked by Deadpikle for additional fixes and features. Readme updates TODO.-
+-Forked by Deadpikle for additional fixes and features. Readme updates TODO. There have been many enhancements and improvements. Please bug me for an updated README if I forget, which I probably will. The code is by no means perfectly clean, but it does function! Be wary of using the stock undo/redo with bulleted lists —- it often fails. Also, I have no idea how CocoaPods updates with forks work, so if someone needs me to do that, please point me in the right direction…-
 
 RichTextEditor for iPhone &amp; iPad
 
