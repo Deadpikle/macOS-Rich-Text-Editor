@@ -1,5 +1,7 @@
 RichTextEditor-iOS
 ==================
+-Forked by Deadpikle for additional fixes and features. Readme updates TODO.-
+
 RichTextEditor for iPhone &amp; iPad
 
 Features:

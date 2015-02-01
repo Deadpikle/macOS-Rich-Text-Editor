@@ -26,6 +26,11 @@
 // THE SOFTWARE.
 
 #import <UIKit/UIKit.h>
+#import "RichTextEditorColorPicker.h"
+#import "RichTextEditorFontPicker.h"
+#import "RichTextEditorFontSizePicker.h"
+
+#define SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(v)  ([[[UIDevice currentDevice] systemVersion] compare:v options:NSNumericSearch] != NSOrderedAscending)
 
 typedef enum{
 	RichTextEditorToolbarPresentationStyleModal,
@@ -53,15 +58,21 @@ typedef enum{
 	RichTextEditorFeatureTextForegroundColor			= 1 << 11,
 	RichTextEditorFeatureParagraphIndentation			= 1 << 12,
 	RichTextEditorFeatureParagraphFirstLineIndentation	= 1 << 13,
-	RichTextEditorFeatureAll							= 1 << 14
+	RichTextEditorFeatureBulletList						= 1 << 14,
+	RichTextEditorTextAttachment						= 1 << 15,
+	RichTextEditorFeatureAll							= 1 << 16,
+    RichTextEditorFeatureUndoRedo						= 1 << 17,
+    RichTextEditorFeatureDismissKeyboard				= 1 << 18
 }RichTextEditorFeature;
 
 @protocol RichTextEditorToolbarDelegate <UIScrollViewDelegate>
+- (void)richTextEditorToolbarDidDismissViewController;
 - (void)richTextEditorToolbarDidSelectBold;
 - (void)richTextEditorToolbarDidSelectItalic;
 - (void)richTextEditorToolbarDidSelectUnderline;
 - (void)richTextEditorToolbarDidSelectStrikeThrough;
-- (void)richTextEditorToolbarDidSelectBulletPoint;
+- (void)richTextEditorToolbarDidSelectBulletListWithCaller:(id)caller;
+- (void)richTextEditorToolbarDidSelectTextAttachment:(UIImage *)textAttachment;
 - (void)richTextEditorToolbarDidSelectParagraphFirstLineHeadIndent;
 - (void)richTextEditorToolbarDidSelectParagraphIndentation:(ParagraphIndentation)paragraphIndentation;
 - (void)richTextEditorToolbarDidSelectFontSize:(NSNumber *)fontSize;
@@ -69,6 +80,9 @@ typedef enum{
 - (void)richTextEditorToolbarDidSelectTextBackgroundColor:(UIColor *)color;
 - (void)richTextEditorToolbarDidSelectTextForegroundColor:(UIColor *)color;
 - (void)richTextEditorToolbarDidSelectTextAlignment:(NSTextAlignment)textAlignment;
+- (void)richTextEditorToolbarDidSelectUndo;
+- (void)richTextEditorToolbarDidSelectRedo;
+- (void)richTextEditorToolbarDidSelectDismissKeyboard;
 @end
 
 @protocol RichTextEditorToolbarDataSource <NSObject>
@@ -77,8 +91,11 @@ typedef enum{
 - (RichTextEditorToolbarPresentationStyle)presentationStyleForRichTextEditorToolbar;
 - (UIModalPresentationStyle)modalPresentationStyleForRichTextEditorToolbar;
 - (UIModalTransitionStyle)modalTransitionStyleForRichTextEditorToolbar;
-- (UIViewController *)firsAvailableViewControllerForRichTextEditorToolbar;
+- (UIViewController *)firstAvailableViewControllerForRichTextEditorToolbar;
 - (RichTextEditorFeature)featuresEnabledForRichTextEditorToolbar;
+- (UIViewController <RichTextEditorColorPicker> *)colorPickerForRichTextEditorToolbarWithAction:(RichTextEditorColorPickerAction)action;
+- (UIViewController <RichTextEditorFontPicker> *)fontPickerForRichTextEditorToolbar;
+- (UIViewController <RichTextEditorFontSizePicker> *)fontSizePickerForRichTextEditorToolbar;
 @end
 
 @interface RichTextEditorToolbar : UIScrollView

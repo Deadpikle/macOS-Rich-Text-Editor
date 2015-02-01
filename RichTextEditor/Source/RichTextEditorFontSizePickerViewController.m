@@ -90,7 +90,7 @@
 	[self.delegate richTextEditorFontSizePickerViewControllerDidSelectClose];
 }
 
-#pragma mark - UITableView Delegate & Datasrouce -
+#pragma mark - UITableView Delegate & Datasource -
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -108,7 +108,9 @@
 		cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
 	
 	cell.textLabel.text = fontSize.stringValue;
-	cell.textLabel.font = [UIFont boldSystemFontOfSize:fontSize.intValue];
+	//cell.textLabel.font = [UIFont boldSystemFontOfSize:fontSize.intValue];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:20];
+    cell.textLabel.textAlignment = NSTextAlignmentCenter;
 	return cell;
 }
 
@@ -126,6 +128,7 @@
 	{
 		_tableview = [[UITableView alloc] initWithFrame:self.view.bounds];
 		_tableview.autoresizingMask = UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        [_tableview setSeparatorInset:UIEdgeInsetsZero];
 		_tableview.delegate = self;
 		_tableview.dataSource = self;
 	}

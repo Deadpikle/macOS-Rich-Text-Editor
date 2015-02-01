@@ -27,6 +27,7 @@
 
 #import <UIKit/UIKit.h>
 #import "RichTextEditorToolbar.h"
+#include "PSPDFTextView.h"
 
 @class RichTextEditor;
 @protocol RichTextEditorDataSource <NSObject>
@@ -38,16 +39,27 @@
 - (UIModalTransitionStyle)modalTransitionStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (RichTextEditorFeature)featuresEnabledForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEdiotor;
+- (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEditor;
+- (UIViewController <RichTextEditorColorPicker> *)colorPickerForRichTextEditor:(RichTextEditor *)richTextEditor withAction:(RichTextEditorColorPickerAction)action;
+- (UIViewController <RichTextEditorFontPicker> *)fontPickerForRichTextEditor:(RichTextEditor *)richTextEditor;
+- (UIViewController <RichTextEditorFontSizePicker> *)fontSizePickerForRichTextEditor:(RichTextEditor *)richTextEditor;
+-(NSUInteger)levelsOfUndo;
+-(BOOL)handlesUndoRedoForText;
+-(void)userPerformedUndo;
+-(void)userPerformedRedo;
 @end
 
-@interface RichTextEditor : UITextView
+@interface RichTextEditor : PSPDFTextView <UITextViewDelegate>
 
 @property (nonatomic, weak) IBOutlet id <RichTextEditorDataSource> dataSource;
 @property (nonatomic, assign) CGFloat defaultIndentationSize;
+@property  BOOL userInBulletList;
 
 - (void)setBorderColor:(UIColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;
 - (NSString *)htmlString;
-
+- (void)setHtmlString:(NSString *)htmlString;
++(NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
++(NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
+-(void)removeTextObserverForDealloc;
 @end
