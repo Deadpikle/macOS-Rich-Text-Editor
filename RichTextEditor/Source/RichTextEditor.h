@@ -25,41 +25,60 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
-#import "RichTextEditorToolbar.h"
-#include "PSPDFTextView.h"
+#import <Cocoa/Cocoa.h>
+//#import "RichTextEditorToolbar.h"
 
 @class RichTextEditor;
 @protocol RichTextEditorDataSource <NSObject>
 @optional
 - (NSArray *)fontSizeSelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (NSArray *)fontFamilySelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (RichTextEditorToolbarPresentationStyle)presentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (UIModalPresentationStyle)modalPresentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (UIModalTransitionStyle)modalTransitionStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (RichTextEditorFeature)featuresEnabledForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (RichTextEditorToolbarPresentationStyle)presentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (UIModalPresentationStyle)modalPresentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (UIModalTransitionStyle)modalTransitionStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (RichTextEditorFeature)featuresEnabledForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (UIViewController <RichTextEditorColorPicker> *)colorPickerForRichTextEditor:(RichTextEditor *)richTextEditor withAction:(RichTextEditorColorPickerAction)action;
-- (UIViewController <RichTextEditorFontPicker> *)fontPickerForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (UIViewController <RichTextEditorFontSizePicker> *)fontSizePickerForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (UIViewController <RichTextEditorColorPicker> *)colorPickerForRichTextEditor:(RichTextEditor *)richTextEditor withAction:(RichTextEditorColorPickerAction)action;
+//- (UIViewController <RichTextEditorFontPicker> *)fontPickerForRichTextEditor:(RichTextEditor *)richTextEditor;
+//- (UIViewController <RichTextEditorFontSizePicker> *)fontSizePickerForRichTextEditor:(RichTextEditor *)richTextEditor;
 -(NSUInteger)levelsOfUndo;
 -(BOOL)handlesUndoRedoForText;
 -(void)userPerformedUndo;
 -(void)userPerformedRedo;
 @end
 
-@interface RichTextEditor : PSPDFTextView <UITextViewDelegate>
+@protocol RichTextEditorDelegate <NSObject>
+@required
+-(void)userSelectionChanged:(NSRange)range isBold:(BOOL)isBold isItalic:(BOOL)isItalic isUnderline:(BOOL)isUnderline isInBulletedList:(BOOL)isInBulletedList textBackgroundColor:(NSColor*)textBackgroundColor textColor:(NSColor*)textColor;
+@end
 
-@property (nonatomic, weak) IBOutlet id <RichTextEditorDataSource> dataSource;
+typedef enum {
+    ParagraphIndentationIncrease,
+    ParagraphIndentationDecrease
+} ParagraphIndentation;
+
+@interface RichTextEditor : NSTextView <NSTextViewDelegate>
+
+@property (assign) IBOutlet id <RichTextEditorDataSource> rteDataSource;
+@property (assign) IBOutlet id <RichTextEditorDelegate> rteDelegate;
 @property (nonatomic, assign) CGFloat defaultIndentationSize;
 @property  BOOL userInBulletList;
 
-- (void)setBorderColor:(UIColor*)borderColor;
+-(void)userSelectedBold;
+-(void)userSelectedItalic;
+-(void)userSelectedUnderline;
+-(void)userSelectedBullet;
+-(void)userSelectedIncreaseIndent;
+-(void)userSelectedDecreaseIndent;
+// TODO: text background color, text color
+
+- (void)setBorderColor:(NSColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
-+(NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
-+(NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
--(void)removeTextObserverForDealloc;
++ (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
++ (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
+- (void)removeTextObserverForDealloc;
+
 @end

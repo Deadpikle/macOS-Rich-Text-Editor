@@ -25,15 +25,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <UIKit/UIKit.h>
+#import <Cocoa/Cocoa.h>
 #import <CoreText/CoreText.h>
 
-@interface UIFont (RichTextEditor)
+@interface NSFont (RichTextEditor)
 
 + (NSString *)postscriptNameFromFullName:(NSString *)fullName;
-+ (UIFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic;
-- (UIFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size;
-- (UIFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic;
++ (NSFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic;
+- (NSFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size;
+- (NSFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic;
 - (BOOL)isBold;
 - (BOOL)isItalic;
 

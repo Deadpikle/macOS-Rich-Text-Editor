@@ -25,19 +25,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import "UIFont+RichTextEditor.h"
+#import "NSFont+RichTextEditor.h"
 
-@implementation UIFont (RichTextEditor)
+@implementation NSFont (RichTextEditor)
 
 + (NSString *)postscriptNameFromFullName:(NSString *)fullName
 {
-	UIFont *font = [UIFont fontWithName:fullName size:1];
+	NSFont *font = [NSFont fontWithName:fullName size:1];
 	return (__bridge NSString *)(CTFontCopyPostScriptName((__bridge CTFontRef)(font)));
 }
 
-+ (UIFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic
++ (NSFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic
 {
-	NSString *postScriptName = [UIFont postscriptNameFromFullName:name];
+	NSString *postScriptName = [NSFont postscriptNameFromFullName:name];
 	
 	CTFontSymbolicTraits traits = 0;
 	CTFontRef newFontRef;
@@ -66,21 +66,21 @@
 		NSString *fontNameKey = (__bridge NSString *)(CTFontCopyName(newFontRef, kCTFontPostScriptNameKey));
         CGFloat size = CTFontGetSize(newFontRef);
 		CFRelease(newFontRef);
-		return [UIFont fontWithName:fontNameKey size:size];
+		return [NSFont fontWithName:fontNameKey size:size];
 	}
 	
 	return nil;
 }
 
-- (UIFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size
+- (NSFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size
 {
 	CTFontRef fontRef = (__bridge CTFontRef)self;
 	NSString *familyName = (__bridge NSString *)(CTFontCopyName(fontRef, kCTFontFamilyNameKey));
-	NSString *postScriptName = [UIFont postscriptNameFromFullName:familyName];
+	NSString *postScriptName = [NSFont postscriptNameFromFullName:familyName];
 	return [[self class] fontWithName:postScriptName size:size boldTrait:bold italicTrait:italic];
 }
 
-- (UIFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic
+- (NSFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic
 {
 	return [self fontWithBoldTrait:bold italicTrait:italic andSize:self.pointSize];
 }

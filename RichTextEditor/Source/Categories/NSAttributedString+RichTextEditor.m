@@ -127,9 +127,9 @@
 							  usingBlock:^(NSDictionary *dictionary, NSRange range, BOOL *stop){
 											  
 								  NSMutableString *fontString = [NSMutableString string];
-								  UIFont *font = [dictionary objectForKey:NSFontAttributeName];
-								  UIColor *foregroundColor = [dictionary objectForKey:NSForegroundColorAttributeName];
-								  UIColor *backGroundColor = [dictionary objectForKey:NSBackgroundColorAttributeName];
+								  NSFont *font = [dictionary objectForKey:NSFontAttributeName];
+								  NSColor *foregroundColor = [dictionary objectForKey:NSForegroundColorAttributeName];
+								  NSColor *backGroundColor = [dictionary objectForKey:NSBackgroundColorAttributeName];
 								  NSNumber *underline = [dictionary objectForKey:NSUnderlineStyleAttributeName];
 								  BOOL hasUnderline = (!underline || underline.intValue == NSUnderlineStyleNone) ? NO :YES;
 								  NSNumber *strikeThrough = [dictionary objectForKey:NSStrikethroughStyleAttributeName];
@@ -143,10 +143,10 @@
 								  
 								  [fontString appendFormat:@"font-size:%.0fpx; ", font.pointSize];
 								  
-								  if (foregroundColor && [foregroundColor isKindOfClass:[UIColor class]])
+								  if (foregroundColor && [foregroundColor isKindOfClass:[NSColor class]])
 									  [fontString appendFormat:@"color:%@; ", [self htmlRgbColor:foregroundColor]];
 								  
-								  if (backGroundColor && [backGroundColor isKindOfClass:[UIColor class]])
+								  if (backGroundColor && [backGroundColor isKindOfClass:[NSColor class]])
 									  [fontString appendFormat:@"background-color:%@; ", [self htmlRgbColor:backGroundColor]];
 								  
 								  [fontString appendString:@"\" "];
@@ -196,16 +196,16 @@
 {
 	switch (textAlignment)
 	{
-		case NSTextAlignmentLeft:
+		case NSLeftTextAlignment:
 			return @"left";
 	
-		case NSTextAlignmentCenter:
+		case NSCenterTextAlignment:
 			return @"center";
 			
-		case NSTextAlignmentRight:
+		case NSRightTextAlignment:
 			return @"right";
 			
-		case NSTextAlignmentJustified:
+		case NSJustifiedTextAlignment:
 			return @"justify";
 			
 		default:
@@ -213,7 +213,7 @@
 	}
 }
 
-- (NSString *)htmlRgbColor:(UIColor *)color
+- (NSString *)htmlRgbColor:(NSColor *)color
 {
 	CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
 	[color getRed:&red green:&green blue:&blue alpha:&alpha];
