@@ -177,7 +177,7 @@
         NSDictionary *attributes = [self typingAttributes];
         NSFont *font = [attributes objectForKey:NSFontAttributeName];
         NSColor *fontColor = [attributes objectForKey:NSForegroundColorAttributeName];
-        NSColor *backgroundColor = [attributes objectForKey:NSStrokeColorAttributeName]; // may want NSBackgroundColorAttributeName
+        NSColor *backgroundColor = [attributes objectForKey:NSBackgroundColorAttributeName]; // may want NSBackgroundColorAttributeName
         [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:self.userInBulletList textBackgroundColor:backgroundColor textColor:fontColor];
     }
 }
@@ -207,6 +207,15 @@
 
 -(void)userSelectedDecreaseIndent {
     [self richTextEditorToolbarDidSelectParagraphIndentation:ParagraphIndentationDecrease];
+}
+
+
+-(void)userSelectedTextBackgroundColor:(NSColor*)color {
+    [self richTextEditorToolbarDidSelectTextBackgroundColor:color];
+}
+
+-(void)userSelectedTextColor:(NSColor*)color {
+    [self richTextEditorToolbarDidSelectTextForegroundColor:color];
 }
 
 - (BOOL)canBecomeFirstResponder

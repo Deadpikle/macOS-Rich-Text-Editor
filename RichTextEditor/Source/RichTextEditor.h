@@ -71,6 +71,8 @@ typedef enum {
 -(void)userSelectedBullet;
 -(void)userSelectedIncreaseIndent;
 -(void)userSelectedDecreaseIndent;
+-(void)userSelectedTextBackgroundColor:(NSColor*)color;
+-(void)userSelectedTextColor:(NSColor*)color;
 // TODO: text background color, text color
 
 - (void)setBorderColor:(NSColor*)borderColor;
