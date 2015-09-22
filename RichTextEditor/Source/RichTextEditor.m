@@ -51,6 +51,9 @@
 
 @property float currSysVersion;
 
+@property NSInteger MAX_INDENT;
+@property BOOL isInTextDidChange;
+
 @end
 
 @implementation RichTextEditor
@@ -98,6 +101,7 @@
 	*/
 	self.typingAttributesInProgress = NO;
     self.userInBulletList = NO;
+    self.isInTextDidChange = NO;
     
     // Instead of hard-coding the default indentation size, which can make bulleted lists look a little
     // odd when increasing/decreasing their indent, use a \t character width instead
@@ -106,7 +110,7 @@
 	NSDictionary *dictionary = [self dictionaryAtIndex:self.selectedRange.location];
     CGSize expectedStringSize = [@"\t" sizeWithAttributes:dictionary];
 	self.defaultIndentationSize = expectedStringSize.width;
-    
+    self.MAX_INDENT = self.defaultIndentationSize * 5;
 	[self setupMenuItems];
 	[self updateToolbarState];
     if (self.rteDataSource && [self.rteDataSource respondsToSelector:@selector(levelsOfUndo)])
@@ -123,10 +127,15 @@
         self.layoutManager.allowsNonContiguousLayout = NO;
 }
 
+
 -(void)textDidChange:(NSNotification *)notification {
-    NSLog(@"Text view changed");
-    [self applyBulletListIfApplicable];
-    [self deleteBulletListWhenApplicable];
+    //NSLog(@"Text view changed");
+    if (!self.isInTextDidChange) {
+        self.isInTextDidChange = YES;
+        [self applyBulletListIfApplicable];
+        [self deleteBulletListWhenApplicable];
+        self.isInTextDidChange = NO;
+    }
 }
 
 -(void)dealloc {
@@ -142,7 +151,7 @@
 
 - (void)textViewDidChangeSelection
 {
-    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
+    //NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self updateToolbarState];
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
@@ -245,17 +254,19 @@
 }
 */
 
+/*
 - (void)setAttributedText:(NSAttributedString *)attributedText
 {
 	//[super setAttributedText:attributedText];
 	[self updateToolbarState];
-}
+}*/
 
+/*
 - (void)setText:(NSString *)text
 {
     //[super setText:text];
 	[self updateToolbarState];
-}
+}*/
 
 - (void)setFont:(NSFont *)font
 {
@@ -293,7 +304,7 @@
 {
     NSAttributedString *attr = [RichTextEditor attributedStringFromHTMLString:htmlString];
     if (attr)
-        [self setAttributedText:attr];
+        [self setAttributedString:attr];
 }
 
 - (NSString *)htmlString
@@ -478,15 +489,18 @@
 
 - (void)richTextEditorToolbarDidSelectParagraphIndentation:(ParagraphIndentation)paragraphIndentation
 {
+    self.isInTextDidChange = YES;
     __block NSDictionary *dictionary;
     __block NSMutableParagraphStyle *paragraphStyle;
+    NSRange currSelectedRange = self.selectedRange;
 	[self enumarateThroughParagraphsInRange:self.selectedRange withBlock:^(NSRange paragraphRange){
         dictionary = [self dictionaryAtIndex:paragraphRange.location];
         paragraphStyle = [[dictionary objectForKey:NSParagraphStyleAttributeName] mutableCopy];
 		if (!paragraphStyle)
 			paragraphStyle = [[NSMutableParagraphStyle alloc] init];
 
-		if (paragraphIndentation == ParagraphIndentationIncrease)
+		if (paragraphIndentation == ParagraphIndentationIncrease &&
+            paragraphStyle.headIndent < self.MAX_INDENT && paragraphStyle.firstLineHeadIndent < self.MAX_INDENT)
 		{
 			paragraphStyle.headIndent += self.defaultIndentationSize;
 			paragraphStyle.firstLineHeadIndent += self.defaultIndentationSize;
@@ -503,19 +517,20 @@
 				paragraphStyle.firstLineHeadIndent = 0; // this affects left cursor placement 
 		}
 		[self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:paragraphRange];
-	}];
-    
+    }];
+    [self setSelectedRange:currSelectedRange];
+    self.isInTextDidChange = NO;
+    // Old iOS code
     // Following 2 lines allow the user to insta-type after indenting in a bulleted list
-    NSRange range = NSMakeRange(self.selectedRange.location+self.selectedRange.length, 0);
-    [self setSelectedRange:range];
-    
+    //NSRange range = NSMakeRange(self.selectedRange.location+self.selectedRange.length, 0);
+    //[self setSelectedRange:range];
     // Check to see if the current paragraph is blank. If it is, manually get the cursor to move with a weird hack.
-    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
+    /*NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
 	BOOL currParagraphIsBlank = [[self.attributedString.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""] ? YES: NO;
     if (currParagraphIsBlank)
     {
         [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:rangeOfCurrentParagraph];
-    }
+    }*/
 }
 
 // Manually moves the cursor to the correct location. Ugly work around and weird but it works (at least in iOS 7).
@@ -578,7 +593,8 @@
 -(void)setAttributedString:(NSAttributedString*)attributedString {
     NSUInteger currStringLength = [self.string length];
     [self insertText:@"" replacementRange:NSMakeRange(0, currStringLength)];
-    [self insertText:attributedString replacementRange:NSMakeRange(0, 0)];
+    if (![attributedString.string isEqualToString:@""])
+        [self insertText:attributedString replacementRange:NSMakeRange(0, 0)];
 }
 
 - (void)richTextEditorToolbarDidSelectBulletListWithCaller:(id)caller
@@ -587,6 +603,7 @@
     //    self.scrollEnabled = NO;
     //if (caller == self.toolBar)
     //    self.userInBulletList = !self.userInBulletList;
+    NSLog(@"Bullet code called");
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
@@ -597,6 +614,7 @@
     NSMutableParagraphStyle *prevParaStyle = [prevParaDict objectForKey:NSParagraphStyleAttributeName];
 	
 	__block NSInteger rangeOffset = 0;
+    __block BOOL mustDecreaseIndentAfterRemovingBullet = NO;
 	
 	[self enumarateThroughParagraphsInRange:self.selectedRange withBlock:^(NSRange paragraphRange){
 		NSRange range = NSMakeRange(paragraphRange.location + rangeOffset, paragraphRange.length);
@@ -623,6 +641,7 @@
 			
 			rangeOffset = rangeOffset - BULLET_STRING.length;
             self.userInBulletList = NO;
+            mustDecreaseIndentAfterRemovingBullet = YES;
 		}
 		else
         {
@@ -630,15 +649,18 @@
 			range = NSMakeRange(range.location, range.length + BULLET_STRING.length);
 			
 			NSMutableAttributedString *bulletAttributedString = [[NSMutableAttributedString alloc] initWithString:BULLET_STRING attributes:nil];
-            /* I considered manually removing any bold/italic/underline/strikethrough from the text, but 
-             // decided against it. If the user wants bold bullets, let them have bold bullets!
-            UIFont *prevFont = [dictionary objectForKey:NSFontAttributeName];
-            UIFont *bulletFont = [UIFont fontWithName:[prevFont familyName] size:[prevFont pointSize]];
+            // The following code attempts to remove any underline from the bullet string, but it doesn't work right. I don't know why.
+          /*  NSFont *prevFont = [dictionary objectForKey:NSFontAttributeName];
+            NSFont *bulletFont = [NSFont fontWithName:[prevFont familyName] size:[prevFont pointSize]];
+            
             NSMutableDictionary *bulletDict = [dictionary mutableCopy];
             [bulletDict setObject:bulletFont forKey:NSFontAttributeName];
-            [bulletDict setObject:0 forKey:NSStrikethroughStyleAttributeName];
-            [bulletDict setObject:0 forKey:NSUnderlineStyleAttributeName];
-            */
+            [bulletDict removeObjectForKey:NSStrikethroughStyleAttributeName];
+            [bulletDict setValue:NSUnderlineStyleNone forKey:NSUnderlineStyleAttributeName];
+            [bulletDict removeObjectForKey:NSStrokeColorAttributeName];
+            [bulletDict removeObjectForKey:NSStrokeWidthAttributeName];
+            dictionary = bulletDict;*/
+            
             [bulletAttributedString setAttributes:dictionary range:NSMakeRange(0, BULLET_STRING.length)];
 			
 			[currentAttributedString insertAttributedString:bulletAttributedString atIndex:range.location];
@@ -655,7 +677,8 @@
             // if not, then use defaultIndentation size
             if (!doesPrefixWithBullet)
                 paragraphStyle.firstLineHeadIndent = self.defaultIndentationSize;
-            else paragraphStyle.firstLineHeadIndent = prevParaStyle.firstLineHeadIndent;
+            else
+                paragraphStyle.firstLineHeadIndent = prevParaStyle.firstLineHeadIndent;
             
 			paragraphStyle.headIndent = expectedStringSize.width;
 			
@@ -669,7 +692,7 @@
 	
 	// If paragraph is empty move cursor to front of bullet, so the user can start typing right away
     NSRange rangeForSelection;
-	if (rangeOfParagraphsInSelectedText.count == 1 && rangeOfCurrentParagraph.length == 0)
+	if (rangeOfParagraphsInSelectedText.count == 1 && rangeOfCurrentParagraph.length == 0 && self.userInBulletList)
 	{
         rangeForSelection = NSMakeRange(rangeOfCurrentParagraph.location + BULLET_STRING.length, 0);
 	}
@@ -689,6 +712,8 @@
     //if (self.currSysVersion < 8.0)
     //    self.scrollEnabled = YES;
     [self setSelectedRange:rangeForSelection];
+    if (mustDecreaseIndentAfterRemovingBullet) // remove the extra indentation added by the bullet
+        [self richTextEditorToolbarDidSelectParagraphIndentation:ParagraphIndentationDecrease];
 }
 
 - (void)richTextEditorToolbarDidSelectTextAttachment:(NSImage *)textAttachment
@@ -762,8 +787,12 @@
 		NSRange paragraphRange = [value rangeValue];
 		block(paragraphRange);
 	}
-	
+    rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange fullRange = [self fullRangeFromArrayOfParagraphRanges:rangeOfParagraphsInSelectedText];
+    if (fullRange.location + fullRange.length > [self.attributedString length]) {
+        fullRange.length = 0;
+        fullRange.location = [self.attributedString length]-1;
+    }
 	[self setSelectedRange:fullRange];
 }
 
@@ -842,9 +871,9 @@
         
 		[attributedString addAttributes:[NSDictionary dictionaryWithObject:attribute forKey:key] range:range];
 		
-		[self setAttributedText:attributedString];
+		[self setAttributedString:attributedString];
         //if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
-            [self setSelectedRange:range];
+         //   [self setSelectedRange:range];
 	}
 	// If no text is selected apply attributes to typingAttribute
 	else
