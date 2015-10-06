@@ -27,6 +27,9 @@
 
 // stackoverflow.com/questions/26454037/uitextview-text-selection-and-highlight-jumping-in-ios-8
 
+// THIS THING IS A MESS
+// BUT BOY DID IT SAVE ME TIME ON OS X
+
 #import "RichTextEditor.h"
 #import <QuartzCore/QuartzCore.h>
 #import "NSFont+RichTextEditor.h"
@@ -110,7 +113,7 @@
 	NSDictionary *dictionary = [self dictionaryAtIndex:self.selectedRange.location];
     CGSize expectedStringSize = [@"\t" sizeWithAttributes:dictionary];
 	self.defaultIndentationSize = expectedStringSize.width;
-    self.MAX_INDENT = self.defaultIndentationSize * 5;
+    self.MAX_INDENT = self.defaultIndentationSize * 10;
 	[self setupMenuItems];
 	[self updateToolbarState];
     if (self.rteDataSource && [self.rteDataSource respondsToSelector:@selector(levelsOfUndo)])
@@ -125,6 +128,9 @@
    /* self.currSysVersion = [[[UIDevice currentDevice] systemVersion] floatValue];
     if (self.currSysVersion >= 8.0)*/
         self.layoutManager.allowsNonContiguousLayout = NO;
+    self.selectedRange = NSMakeRange(0, 0);
+    if ([self.string isEqualToString:@" "])
+        self.attributedString = [[NSAttributedString alloc] initWithString:@""];
 }
 
 
@@ -149,8 +155,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)textViewDidChangeSelection
-{
+- (void)textViewDidChangeSelection {
     //NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self updateToolbarState];
     [self setNeedsLayout:YES];
@@ -176,7 +181,11 @@
     if (self.rteDelegate) {
         NSDictionary *attributes = [self typingAttributes];
         NSFont *font = [attributes objectForKey:NSFontAttributeName];
+        //if (!font)
+        //    font = [self fontAtIndex:self.selectedRange.location];;
         NSColor *fontColor = [attributes objectForKey:NSForegroundColorAttributeName];
+        //fontColor = [fontColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace]; // NSDeviceRGBColorSpace?
+        //NSLog(@"R: %f, G: %f, B: %f", [fontColor redComponent], [fontColor greenComponent], [fontColor blueComponent]);
         NSColor *backgroundColor = [attributes objectForKey:NSBackgroundColorAttributeName]; // may want NSBackgroundColorAttributeName
         [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:self.userInBulletList textBackgroundColor:backgroundColor textColor:fontColor];
     }
@@ -384,6 +393,9 @@
 - (void)richTextEditorToolbarDidSelectBold
 {
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
+    if (!font) {
+        
+    }
 	[self applyFontAttributesToSelectedRangeWithBoldTrait:[NSNumber numberWithBool:![font isBold]] italicTrait:nil fontName:nil fontSize:nil];
 }
 
