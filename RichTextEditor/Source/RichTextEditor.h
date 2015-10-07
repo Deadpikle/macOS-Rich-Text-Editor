@@ -79,6 +79,7 @@ typedef enum {
 - (void)setBorderWidth:(CGFloat)borderWidth;
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
+- (void)changeToAttributedString:(NSAttributedString*)string;
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
 - (void)removeTextObserverForDealloc;

@@ -330,6 +330,11 @@
     return [RichTextEditor htmlStringFromAttributedText:self.attributedString];
 }
 
+- (void)changeToAttributedString:(NSAttributedString*)string
+{
+    [self setAttributedString:string];
+}
+
 +(NSString *)htmlStringFromAttributedText:(NSAttributedString*)text
 {
 	/*if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"7.0"))
@@ -612,10 +617,12 @@
 }
 
 -(void)setAttributedString:(NSAttributedString*)attributedString {
-    NSUInteger currStringLength = [self.string length];
+    [[self textStorage] setAttributedString:attributedString];
+    
+/*    NSUInteger currStringLength = [self.string length];
     [self insertText:@"" replacementRange:NSMakeRange(0, currStringLength)];
     if (![attributedString.string isEqualToString:@""])
-        [self insertText:attributedString replacementRange:NSMakeRange(0, 0)];
+        [self insertText:attributedString replacementRange:NSMakeRange(0, 0)];*/
 }
 
 - (void)richTextEditorToolbarDidSelectBulletListWithCaller:(id)caller
