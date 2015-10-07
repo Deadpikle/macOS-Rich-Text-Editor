@@ -898,8 +898,9 @@
             ++range.length;
         
 		[attributedString addAttributes:[NSDictionary dictionaryWithObject:attribute forKey:key] range:range];
-		
+        NSRange selectedRange = [self selectedRange];
 		[self setAttributedString:attributedString];
+        [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
         //if (!SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8.0"))
          //   [self setSelectedRange:range];
 	}
