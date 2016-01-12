@@ -1,5 +1,5 @@
 Created by Aryan Gh on 5/4/13.
-Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
+Copyright (c) 2013 Aryan Ghassemi & Deadpikle. All rights reserved.
 
 https://github.com/aryaxt/iOS-Rich-Text-Editor
 

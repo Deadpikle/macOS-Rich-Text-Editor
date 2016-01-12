@@ -3,7 +3,7 @@
 //  RichTextEdtor
 //
 //  Created by Aryan Gh on 7/21/13.
-//  Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
+//  Copyright (c) 2013 Aryan Ghassemi & Deadpikle. All rights reserved.
 //
 // https://github.com/aryaxt/iOS-Rich-Text-Editor
 //
@@ -25,27 +25,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// Make sure to call removeTextObserverForDealloc before going away (forever) from the screen with the RTE
+
+// TODO: better documentation
+
 #import <Cocoa/Cocoa.h>
-//#import "RichTextEditorToolbar.h"
 
 @class RichTextEditor;
 @protocol RichTextEditorDataSource <NSObject>
 @optional
 - (NSArray *)fontSizeSelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (NSArray *)fontFamilySelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (RichTextEditorToolbarPresentationStyle)presentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (UIModalPresentationStyle)modalPresentationStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (UIModalTransitionStyle)modalTransitionStyleForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (RichTextEditorFeature)featuresEnabledForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (UIViewController <RichTextEditorColorPicker> *)colorPickerForRichTextEditor:(RichTextEditor *)richTextEditor withAction:(RichTextEditorColorPickerAction)action;
-//- (UIViewController <RichTextEditorFontPicker> *)fontPickerForRichTextEditor:(RichTextEditor *)richTextEditor;
-//- (UIViewController <RichTextEditorFontSizePicker> *)fontSizePickerForRichTextEditor:(RichTextEditor *)richTextEditor;
--(NSUInteger)levelsOfUndo;
--(BOOL)handlesUndoRedoForText;
--(void)userPerformedUndo;
--(void)userPerformedRedo;
+- (NSUInteger)levelsOfUndo;
+- (BOOL)handlesUndoRedoForText;
+- (void)userPerformedUndo; // TODO: remove?
+- (void)userPerformedRedo; // TODO: remove?
 @end
 
 @protocol RichTextEditorDelegate <NSObject>
@@ -53,10 +49,10 @@
 -(void)userSelectionChanged:(NSRange)range isBold:(BOOL)isBold isItalic:(BOOL)isItalic isUnderline:(BOOL)isUnderline isInBulletedList:(BOOL)isInBulletedList textBackgroundColor:(NSColor*)textBackgroundColor textColor:(NSColor*)textColor;
 @end
 
-typedef enum {
+typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     ParagraphIndentationIncrease,
     ParagraphIndentationDecrease
-} ParagraphIndentation;
+};
 
 @interface RichTextEditor : NSTextView <NSTextViewDelegate>
 
@@ -65,23 +61,40 @@ typedef enum {
 @property (nonatomic, assign) CGFloat defaultIndentationSize;
 @property  BOOL userInBulletList;
 
--(void)userSelectedBold;
--(void)userSelectedItalic;
--(void)userSelectedUnderline;
--(void)userSelectedBullet;
--(void)userSelectedIncreaseIndent;
--(void)userSelectedDecreaseIndent;
--(void)userSelectedTextBackgroundColor:(NSColor*)color;
--(void)userSelectedTextColor:(NSColor*)color;
-// TODO: text background color, text color
+// call these methods when the user does the given action (clicks bold button, etc.)
+- (void)userSelectedBold;
+- (void)userSelectedItalic;
+- (void)userSelectedUnderline;
+- (void)userSelectedBullet;
+- (void)userSelectedIncreaseIndent;
+- (void)userSelectedDecreaseIndent;
+- (void)userSelectedTextBackgroundColor:(NSColor*)color;
+- (void)userSelectedTextColor:(NSColor*)color;
+
+- (void)undo;
+- (void)redo;
+
+- (void)userChangedToFontName:(NSString*)fontName;
+- (void)userChangedToFontSize:(NSNumber*)fontSize;
+
+- (void)increaseFontSize;
+- (void)decreaseFontSize;
+
+- (void)userSelectedParagraphFirstLineHeadIndent;
+- (void)userSelectedTextAlignment:(NSTextAlignment)textAlignment;
+
+- (BOOL)hasSelection; // convenience method; YES if user has something selected
+
+- (void)changeToAttributedString:(NSAttributedString*)string;
+
+- (void)removeTextObserverForDealloc;
 
 - (void)setBorderColor:(NSColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;
+
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
-- (void)changeToAttributedString:(NSAttributedString*)string;
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
-- (void)removeTextObserverForDealloc;
 
 @end
