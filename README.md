@@ -3,6 +3,7 @@ RichTextEditor -- Mac OS X
 MAC NOTES:
 -The Mac version has no toolbar or things like that. You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. for you. Some day, in a perfect world, I'll update this with a proper example. Rest assured, however, that I (Deadpikle) am using this code in a presentation software package for speaker notes rich text editing, and it works rather well.
 -You only need 6 files (yes, I haven't deleted the extra files off this branch):
+
 	- RichTextEditor.h/m
 	- NSFont+RichTextEditor.h/m
 	- NSAttributedString+RichTextEditor.h/m
