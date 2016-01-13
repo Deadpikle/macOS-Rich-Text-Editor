@@ -486,6 +486,8 @@
 - (void)userSelectedBullet
 {
     //NSLog(@"[RTE] Bullet code called");
+    if (!self.isEditable)
+        return;
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
