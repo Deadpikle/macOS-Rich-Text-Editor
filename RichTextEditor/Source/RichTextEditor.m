@@ -246,6 +246,12 @@
     [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
 }
 
+
+- (void)userSelectedPageBreak:(NSString*)pageBreakString
+{
+    [self.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:pageBreakString attributes:[self typingAttributes]]];
+}
+
 - (BOOL)canBecomeFirstResponder
 {
 	return YES;
@@ -414,12 +420,14 @@
     //NSRange range = NSMakeRange(self.selectedRange.location+self.selectedRange.length, 0);
     //[self setSelectedRange:range];
     // Check to see if the current paragraph is blank. If it is, manually get the cursor to move with a weird hack.
-    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
+    
+    // After NSTextStorage changes, these don't seem necessary
+   /* NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
 	BOOL currParagraphIsBlank = [[self.attributedString.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""] ? YES: NO;
     if (currParagraphIsBlank)
     {
-        [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:rangeOfCurrentParagraph];
-    }
+       // [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:rangeOfCurrentParagraph];
+    } */
 }
 
 // Manually moves the cursor to the correct location. Ugly work around and weird but it works (at least in iOS 7 / OS X 10.11.2).
@@ -427,16 +435,13 @@
 // and applying that attribute to the current typing attributes it moves the cursor to the right place.
 -(void)setIndentationWithAttributes:(NSDictionary*)attributes paragraphStyle:(NSMutableParagraphStyle*)paragraphStyle atRange:(NSRange)range
 {
-    NSMutableAttributedString *attributedText = [self.attributedString mutableCopy];
     NSMutableAttributedString *space = [[NSMutableAttributedString alloc] initWithString:@" " attributes:attributes];
     [space addAttributes:[NSDictionary dictionaryWithObject:paragraphStyle forKey:NSParagraphStyleAttributeName] range:NSMakeRange(0, 1)];
-    [attributedText insertAttributedString:space atIndex:range.location];
-    [self setAttributedString:attributedText];
+    [self.textStorage insertAttributedString:space atIndex:range.location];
     [self setSelectedRange:NSMakeRange(range.location, 1)];
     [self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:NSMakeRange(self.selectedRange.location+self.selectedRange.length-1, 1)];
     [self setSelectedRange:NSMakeRange(range.location, 0)];
-    [attributedText deleteCharactersInRange:NSMakeRange(range.location, 1)];
-    [self setAttributedString:attributedText];
+    [self.textStorage deleteCharactersInRange:NSMakeRange(range.location, 1)];
     [self applyAttributeToTypingAttribute:paragraphStyle forKey:NSParagraphStyleAttributeName];
 }
 
@@ -517,8 +522,8 @@
 		{
             // User hit the bullet button and is in a bulleted list so we should get rid of the bullet
 			range = NSMakeRange(range.location, range.length - self.BULLET_STRING.length);
-			
-			[currentAttributedString deleteCharactersInRange:NSMakeRange(range.location, self.BULLET_STRING.length)];
+            
+            [self.textStorage deleteCharactersInRange:NSMakeRange(range.location, self.BULLET_STRING.length)];
 			
 			paragraphStyle.firstLineHeadIndent = 0;
 			paragraphStyle.headIndent = 0;
@@ -547,7 +552,7 @@
             
             [bulletAttributedString setAttributes:dictionary range:NSMakeRange(0, self.BULLET_STRING.length)];
 			
-			[currentAttributedString insertAttributedString:bulletAttributedString atIndex:range.location];
+            [self.textStorage insertAttributedString:bulletAttributedString atIndex:range.location];
 			
 			CGSize expectedStringSize = [self.BULLET_STRING sizeWithAttributes:dictionary];
             
@@ -569,9 +574,7 @@
 			rangeOffset = rangeOffset + self.BULLET_STRING.length;
             self.userInBulletList = YES;
 		}
-        [currentAttributedString addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
-        [self setAttributedString:currentAttributedString];
-		//[self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:range];
+        [self.textStorage addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
 	}];
 	
 	// If paragraph is empty move cursor to front of bullet, so the user can start typing right away
@@ -593,9 +596,9 @@
 		}
     }
     //NSLog(@"[RTE] Range for end of bullet: %lu, %lu", (unsigned long)rangeForSelection.location, (unsigned long)rangeForSelection.length);
-    [self setSelectedRange:rangeForSelection];
     if (mustDecreaseIndentAfterRemovingBullet) // remove the extra indentation added by the bullet
         [self userSelectedParagraphIndentation:ParagraphIndentationDecrease];
+    [self setSelectedRange:rangeForSelection];
 }
 
 #pragma mark - Private Methods -
@@ -658,18 +661,14 @@
 	// If any text selected apply attributes to text
 	if (range.length > 0)
 	{
-		NSMutableAttributedString *attributedString = [self.attributedString mutableCopy];
-		
         // Workaround for when there is only one paragraph,
 		// sometimes the attributedString is actually longer by one then the displayed text,
 		// and this results in not being able to set to lef align anymore.
-        if (range.length == attributedString.length-1 && range.length == self.string.length)
+        if (range.length == self.textStorage.length-1 && range.length == self.string.length)
             ++range.length;
         
-		[attributedString addAttributes:[NSDictionary dictionaryWithObject:attribute forKey:key] range:range];
-        NSRange selectedRange = [self selectedRange];
-		[self setAttributedString:attributedString];
-        [self setSelectedRange:selectedRange];
+        [self.textStorage addAttributes:[NSDictionary dictionaryWithObject:attribute forKey:key] range:range];
+        [self setSelectedRange:self.selectedRange];
 	}
 	// If no text is selected apply attributes to typingAttribute
 	else
@@ -683,9 +682,7 @@
 {
 	NSRange initialRange = self.selectedRange;
 	
-	NSMutableAttributedString *attributedString = [self.attributedString mutableCopy];
-    [attributedString removeAttribute:key range:range];
-    [self setAttributedString:attributedString];
+    [self.textStorage removeAttribute:key range:range];
 	
 	[self setSelectedRange:initialRange];
 }
@@ -710,6 +707,7 @@
 	// If any text selected apply attributes to text
 	if (range.length > 0)
 	{
+        // The RTE stopped working when I switched this portion to self.textStorage. Don't know why. TODO:
 		NSMutableAttributedString *attributedString = [self.attributedString mutableCopy];
 		
 		[attributedString beginEditing];
@@ -751,6 +749,7 @@
 }
 
 -(void)changeFontSizeWithOperation:(CGFloat(^)(CGFloat currFontSize))operation {
+    // TODO: change this part to use self.textStorage
     NSMutableAttributedString *attributedString = [self.attributedString mutableCopy];
     
     [attributedString beginEditing];
@@ -802,7 +801,7 @@
 }
 
 // TODO: Fix this function. You can't create a font that isn't bold from a dictionary that has a bold attribute currently, since if you send isBold 0 [nil], it'll use the dictionary, which is bold!
-// In other words, this function has logical errors.
+// In other words, this function has logical errors
 // Returns a font with given attributes. For any missing parameter takes the attribute from a given dictionary
 - (NSFont *)fontwithBoldTrait:(NSNumber *)isBold italicTrait:(NSNumber *)isItalic fontName:(NSString *)fontName fontSize:(NSNumber *)fontSize fromDictionary:(NSDictionary *)dictionary
 {
@@ -894,9 +893,7 @@
             {
                 NSLog(@"[RTE] Getting rid of a bullet due to backspace while in empty bullet paragraph.");
                 // Get rid of bullet string
-                NSMutableAttributedString *mutableAttributedString = [self.attributedString mutableCopy];
-                [mutableAttributedString deleteCharactersInRange:NSMakeRange(range.location-checkStringLength, checkStringLength)];
-                [self setAttributedString:mutableAttributedString];
+                [self.textStorage deleteCharactersInRange:NSMakeRange(range.location-checkStringLength, checkStringLength)];
                 NSRange newRange = NSMakeRange(range.location-checkStringLength, 0);
                 [self setSelectedRange:newRange];
                 
@@ -917,14 +914,10 @@
                     if ([[self.attributedString.string substringWithRange:rangeOfPreviousParagraph] hasSuffix:self.BULLET_STRING])
                     {
                         NSLog(@"[RTE] Getting rid of bullets due to user hitting enter.");
-                        NSMutableAttributedString *mutableAttributedString = [self.attributedString mutableCopy];
                         NSRange rangeToDelete = NSMakeRange(rangeOfPreviousParagraph.location, rangeOfPreviousParagraph.length+rangeOfCurrentParagraph.length+1);
-                        [mutableAttributedString deleteCharactersInRange:rangeToDelete];
-                        [self setAttributedString:mutableAttributedString];
-                        
+                        [self.textStorage deleteCharactersInRange:rangeToDelete];
                         NSRange newRange = NSMakeRange(rangeOfPreviousParagraph.location, 0);
                         [self setSelectedRange:newRange];
-                        
                         // Get rid of bullet indentation
                         [self removeBulletIndentation:newRange];
                     }

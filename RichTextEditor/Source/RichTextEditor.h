@@ -92,6 +92,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 - (void)setBorderColor:(NSColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;
 
+- (void)userSelectedPageBreak:(NSString*)pageBreakString;
+
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
