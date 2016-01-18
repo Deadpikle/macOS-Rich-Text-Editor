@@ -668,11 +668,25 @@
             ++range.length;
         
         [self.textStorage addAttributes:[NSDictionary dictionaryWithObject:attribute forKey:key] range:range];
-        [self setSelectedRange:self.selectedRange];
+        
+        // Have to update typing attributes because the selection won't change after these attributes have changed.
+        // Update them to the current selection
+        // http://stackoverflow.com/questions/11835497/nstextview-not-applying-attributes-to-newly-inserted-text
+        NSArray *selectedRanges = self.selectedRanges;
+        if (selectedRanges && selectedRanges.count > 0)
+        {
+            NSValue *firstSelectionRangeValue = [selectedRanges objectAtIndex:0];
+            if (firstSelectionRangeValue)
+            {
+                NSRange firstCharacterOfSelectedRange = [firstSelectionRangeValue rangeValue];
+                NSDictionary *attributesDictionary = [self.textStorage attributesAtIndex: firstCharacterOfSelectedRange.location effectiveRange: NULL];
+                [self setTypingAttributes: attributesDictionary];
+            }
+        }
 	}
-	// If no text is selected apply attributes to typingAttribute
 	else
-	{
+    {
+        // If no text is selected apply attributes to typingAttribute
 		self.typingAttributesInProgress = YES;
 		[self applyAttributeToTypingAttribute:attribute forKey:key];
 	}
