@@ -2,11 +2,13 @@ RichTextEditor -- Mac OS X
 ==================
 MAC NOTES:
 -The Mac version has no toolbar or things like that. You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. for you. Some day, in a perfect world, I'll update this with a proper example. Rest assured, however, that I (Deadpikle) am using this code in a presentation software package for speaker notes rich text editing, and it works rather well.
--You only need 6 files (yes, I haven't deleted the extra files off this branch):
+-You only need 6 files:
 
 	- RichTextEditor.h/m
 	- NSFont+RichTextEditor.h/m
 	- NSAttributedString+RichTextEditor.h/m
+
+-The Mac version is improved over the iOS version. It uses NSTextStorage instead of replacing the entire attributed string, which fixes several problems and also increases performance. It also has more features overall. Eventually, these updates should propagate to the iOS version (someone want to make a pull request and perform those updates? We'd have to drop < iOS 6 support...).
 
 -Forked by Deadpikle for additional fixes and features. Readme updates TODO. There have been many enhancements and improvements. Please bug me for an updated README if I forget, which I probably will. The code is by no means perfectly clean, but it does function! Be wary of using the stock undo/redo with bulleted lists —- it often fails. Also, I have no idea how CocoaPods updates with forks work, so if someone needs me to do that, please point me in the right direction…-
 
@@ -87,7 +89,7 @@ Features can be turned on/off by iplementing the following data source method
 ```objective-c
 - (RichTextEditorFeature)featuresEnabledForRichTextEditor:(RichTextEditor *)richTextEditor
 {
-   return RichTextEditorFeatureFont | 
+   return RichTextEditorFeatureFont |
           RichTextEditorFeatureFontSize |
           RichTextEditorFeatureBold |
           RichTextEditorFeatureParagraphIndentation;
@@ -102,7 +104,7 @@ This can be usefull when you don't want the toolbar, instead you want to use the
 - (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor
 {
    return YES;
-} 
+}
 ```
 
 Enable/Disable UIMenuController Options
@@ -112,7 +114,7 @@ On default the UIMenuController options (bold, italic, underline, strikeThrough)
 - (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextrEditor:(RichTextEditor *)richTextEdiotor
 {
    return YES;
-} 
+}
 ```
 
 Credits
