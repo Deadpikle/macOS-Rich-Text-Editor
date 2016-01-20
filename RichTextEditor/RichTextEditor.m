@@ -141,6 +141,8 @@
         self.isInTextDidChange = YES;
         [self applyBulletListIfApplicable];
         [self deleteBulletListWhenApplicable];
+        if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
+            [self.rteDelegate textViewChanged:nil];
         self.isInTextDidChange = NO;
     }
 }
@@ -184,6 +186,12 @@
     }
 }
 
+-(void)sendDelegateTVChanged
+{
+    if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
+        [self.rteDelegate textViewChanged:nil];
+}
+
 -(void)userSelectedBold
 {
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
@@ -192,6 +200,7 @@
     }
     [self applyFontAttributesToSelectedRangeWithBoldTrait:[NSNumber numberWithBool:![font isBold]] italicTrait:nil fontName:nil fontSize:nil];
     [self sendDelegateUpdate];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedItalic
@@ -199,6 +208,7 @@
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
     [self applyFontAttributesToSelectedRangeWithBoldTrait:nil italicTrait:[NSNumber numberWithBool:![font isItalic]] fontName:nil fontSize:nil];
     [self sendDelegateUpdate];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedUnderline
@@ -211,15 +221,18 @@
     
     [self applyAttributesToSelectedRange:existingUnderlineStyle forKey:NSUnderlineStyleAttributeName];
     [self sendDelegateUpdate];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedIncreaseIndent
 {
     [self userSelectedParagraphIndentation:ParagraphIndentationIncrease];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedDecreaseIndent {
     [self userSelectedParagraphIndentation:ParagraphIndentationDecrease];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedTextBackgroundColor:(NSColor*)color
@@ -230,6 +243,7 @@
     else
         [self removeAttributeForKeyFromSelectedRange:NSBackgroundColorAttributeName];
     [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedTextColor:(NSColor*)color
@@ -240,12 +254,14 @@
     else
         [self removeAttributeForKeyFromSelectedRange:NSForegroundColorAttributeName];
     [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    [self sendDelegateTVChanged];
 }
 
 
 - (void)userSelectedPageBreak:(NSString*)pageBreakString
 {
     [self.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:pageBreakString attributes:[self typingAttributes]]];
+    [self sendDelegateTVChanged];
 }
 
 - (BOOL)canBecomeFirstResponder
@@ -489,6 +505,13 @@
     //NSLog(@"[RTE] Bullet code called");
     if (!self.isEditable)
         return;
+    if (!self.isInTextDidChange)
+    {
+        if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
+        {
+            [self.rteDelegate textViewChanged:nil];
+        }
+    }
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
@@ -649,13 +672,13 @@
 {
     // http://stackoverflow.com/questions/11835497/nstextview-not-applying-attributes-to-newly-inserted-text
     NSArray *selectedRanges = self.selectedRanges;
-    if (selectedRanges && selectedRanges.count > 0)
+    if (selectedRanges && selectedRanges.count > 0 && [self hasText])
     {
         NSValue *firstSelectionRangeValue = [selectedRanges objectAtIndex:0];
         if (firstSelectionRangeValue)
         {
             NSRange firstCharacterOfSelectedRange = [firstSelectionRangeValue rangeValue];
-            NSDictionary *attributesDictionary = [self.textStorage attributesAtIndex: firstCharacterOfSelectedRange.location effectiveRange: NULL];
+            NSDictionary *attributesDictionary = [self.textStorage attributesAtIndex:firstCharacterOfSelectedRange.location effectiveRange: NULL];
             [self setTypingAttributes: attributesDictionary];
         }
     }

@@ -46,8 +46,15 @@
 @end
 
 @protocol RichTextEditorDelegate <NSObject>
+
 @required
+
 -(void)userSelectionChanged:(NSRange)range isBold:(BOOL)isBold isItalic:(BOOL)isItalic isUnderline:(BOOL)isUnderline isInBulletedList:(BOOL)isInBulletedList textBackgroundColor:(NSColor*)textBackgroundColor textColor:(NSColor*)textColor;
+
+@optional
+
+-(void)textViewChanged:(NSNotification *)notification;
+
 @end
 
 typedef NS_ENUM(NSInteger, ParagraphIndentation) {
