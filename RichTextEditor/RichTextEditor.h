@@ -95,6 +95,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 
 - (void)changeToAttributedString:(NSAttributedString*)string;
 
+- (void)addTextObserver;
 - (void)removeTextObserverForDealloc;
 
 - (void)setBorderColor:(NSColor*)borderColor;

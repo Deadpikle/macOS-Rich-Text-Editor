@@ -151,6 +151,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
+- (void)addTextObserver {
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewDidChangeSelection) name:NSTextViewDidChangeSelectionNotification object:nil];
+}
+
 -(void)removeTextObserverForDealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
@@ -260,7 +264,7 @@
 
 - (void)userSelectedPageBreak:(NSString*)pageBreakString
 {
-    [self.textStorage appendAttributedString:[[NSAttributedString alloc] initWithString:pageBreakString attributes:[self typingAttributes]]];
+    [self.textStorage insertAttributedString:[[NSAttributedString alloc] initWithString:pageBreakString attributes:[self typingAttributes]] atIndex:self.selectedRange.location];
     [self sendDelegateTVChanged];
 }
 
@@ -821,12 +825,14 @@
     [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
         return currFontSize - self.fontSizeChangeAmount;
     }];
+    [self sendDelegateTVChanged];
 }
 
 -(void)increaseFontSize {
     [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
         return currFontSize + self.fontSizeChangeAmount;
     }];
+    [self sendDelegateTVChanged];
 }
 
 // TODO: Fix this function. You can't create a font that isn't bold from a dictionary that has a bold attribute currently, since if you send isBold 0 [nil], it'll use the dictionary, which is bold!
