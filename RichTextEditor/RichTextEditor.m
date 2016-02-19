@@ -282,9 +282,13 @@
 
 - (void)setHtmlString:(NSString *)htmlString
 {
-    NSAttributedString *attr = [RichTextEditor attributedStringFromHTMLString:htmlString];
-    if (attr)
+    NSMutableAttributedString *attr = [[RichTextEditor attributedStringFromHTMLString:htmlString] mutableCopy];
+    if (attr) {
+        if ([attr.string hasSuffix:@"\n"]) {
+            [attr replaceCharactersInRange:NSMakeRange(attr.length - 1, 1) withString:@""];
+        }
         [self setAttributedString:attr];
+    }
 }
 
 - (NSString *)htmlString
