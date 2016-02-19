@@ -310,18 +310,24 @@
 
 +(NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString
 {
-	NSError *error ;
-	NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
-	NSAttributedString *str =
-    [[NSAttributedString alloc] initWithData:data
-                                     options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
-                                               NSCharacterEncodingDocumentAttribute: [NSNumber numberWithInt:NSUTF8StringEncoding]}
-                          documentAttributes:nil error:&error];
-	if (error)
-		NSLog(@"[RTE] Attributed string from HTML string error: %@", error);
-	else
-        return str;
-    return nil;
+    @try {
+        NSError *error ;
+        NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
+        NSAttributedString *str =
+        [[NSAttributedString alloc] initWithData:data
+                                         options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+                                                   NSCharacterEncodingDocumentAttribute: [NSNumber numberWithInt:NSUTF8StringEncoding]}
+                              documentAttributes:nil error:&error];
+        if (error)
+            NSLog(@"[RTE] Attributed string from HTML string error: %@", error);
+        else
+            return str;
+        return nil;
+    }
+    @catch (NSException *e) {
+        NSLog(@"[RTE] Caught exception: %@", [e description]);
+        return nil;
+    }
 }
 
 - (void)setBorderColor:(NSColor *)borderColor
