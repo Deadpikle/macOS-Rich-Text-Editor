@@ -68,6 +68,7 @@
 @property NSUInteger levelsOfUndo;
 
 @property BOOL inBulletedList;
+@property BOOL justDeletedBackward;
 
 @property WZProtocolInterceptor *delegate_interceptor;
 
@@ -171,6 +172,11 @@
     return YES;
 }
 
+-(void)deleteBackward:(id)sender {
+    self.justDeletedBackward = YES;
+    [super deleteBackward:sender];
+}
+
 - (void)textViewDidChangeSelection:(NSNotification *)notification {
 //    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self setNeedsLayout:YES];
@@ -186,12 +192,14 @@
     if (!self.isInTextDidChange)
     {
         self.isInTextDidChange = YES;
-        [self applyBulletListIfApplicable];
+        if (!self.justDeletedBackward) // fix for issue where deleting a char that isn't in a bulleted list right before a bulleted list added a bullet
+            [self applyBulletListIfApplicable];
         [self deleteBulletListWhenApplicable];
         if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
             [self.rteDelegate textViewChanged:nil];
         self.isInTextDidChange = NO;
     }
+    self.justDeletedBackward = NO;
     if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)])
     {
         [self.delegate textDidChange:notification];
@@ -384,14 +392,12 @@
                                          options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
                                                    NSCharacterEncodingDocumentAttribute: [NSNumber numberWithInt:NSUTF8StringEncoding]}
                               documentAttributes:nil error:&error];
-        if (error)
-            NSLog(@"[RTE] Attributed string from HTML string error: %@", error);
-        else
+        if (!error)
             return str;
         return nil;
     }
     @catch (NSException *e) {
-        NSLog(@"[RTE] Caught exception: %@", [e description]);
+        //NSLog(@"[RTE] Caught exception: %@", [e description]);
         return nil;
     }
 }
@@ -443,7 +449,7 @@
             [[self undoManager] undo];
     }
     @catch (NSException *e) {
-        NSLog(@"[RTE] Couldn't perform undo: %@", [e description]);
+        //NSLog(@"[RTE] Couldn't perform undo: %@", [e description]);
         [[self undoManager] removeAllActions];
     }
 }
@@ -464,7 +470,7 @@
             [[self undoManager] redo];
     }
     @catch (NSException *e) {
-        NSLog(@"[RTE] Couldn't perform redo: %@", [e description]);
+//        NSLog(@"[RTE] Couldn't perform redo: %@", [e description]);
         [[self undoManager] removeAllActions];
     }
 }
@@ -938,9 +944,9 @@
     if (rangeOfCurrentParagraph.location == 0)
         return; // there isn't a previous paragraph, so forget it. The user isn't in a bulleted list.
 	NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location-1, 0)];
-    if (!self.inBulletedList)
-    { // fixes issue with backspacing into bullet list adding a bullet
-        NSLog(@"[RTE] NOT in a bulleted list.");
+    if (!self.inBulletedList) // fixes issue with backspacing into bullet list adding a bullet
+    {
+        //NSLog(@"[RTE] NOT in a bulleted list.");
 		BOOL currentParagraphHasBullet = ([[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location]
                                            hasPrefix:self.BULLET_STRING]) ? YES : NO;
 		BOOL previousParagraphHasBullet = ([[self.attributedString.string substringFromIndex:rangeOfPreviousParagraph.location]
@@ -965,6 +971,7 @@
             paragraphStyle.firstLineHeadIndent = 0;
             paragraphStyle.headIndent = 0;
             [self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:rangeOfCurrentParagraph];
+            [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:rangeOfCurrentParagraph];
         }
         return;
     }
@@ -1001,7 +1008,7 @@
             if (((int)(range.location-checkStringLength) >= 0 &&
                  [[self.attributedString.string substringFromIndex:range.location-checkStringLength] hasPrefix:checkString]))
             {
-                NSLog(@"[RTE] Getting rid of a bullet due to backspace while in empty bullet paragraph.");
+                //NSLog(@"[RTE] Getting rid of a bullet due to backspace while in empty bullet paragraph.");
                 // Get rid of bullet string
                 [self.textStorage deleteCharactersInRange:NSMakeRange(range.location-checkStringLength, checkStringLength)];
                 NSRange newRange = NSMakeRange(range.location-checkStringLength, 0);
@@ -1023,7 +1030,7 @@
                     // Since it gets here AFTER it adds a new bullet
                     if ([[self.attributedString.string substringWithRange:rangeOfPreviousParagraph] hasSuffix:self.BULLET_STRING])
                     {
-                        NSLog(@"[RTE] Getting rid of bullets due to user hitting enter.");
+                        //NSLog(@"[RTE] Getting rid of bullets due to user hitting enter.");
                         NSRange rangeToDelete = NSMakeRange(rangeOfPreviousParagraph.location, rangeOfPreviousParagraph.length+rangeOfCurrentParagraph.length+1);
                         [self.textStorage deleteCharactersInRange:rangeToDelete];
                         NSRange newRange = NSMakeRange(rangeOfPreviousParagraph.location, 0);
