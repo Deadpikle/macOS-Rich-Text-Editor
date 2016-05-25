@@ -4,7 +4,7 @@
 //
 //  Created by Aryan Gh on 7/21/13.
 //  Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
-//  Heavily extended and improved for iOS and OS X by Deadpikle
+//  Heavily modified for iOS and OS X by Deadpikle
 //  Copyright (c) 2016 Deadpikle. All rights reserved.
 //
 // https://github.com/aryaxt/iOS-Rich-Text-Editor -- Original
@@ -29,6 +29,8 @@
 // THE SOFTWARE.
 
 // May want to implement https://github.com/sweetmandm/Auto-List-Continuation-For-UITextView/blob/master/AutomaticBulletAndNumberLists.m
+// The above link would help with the initial bullet creation, perhaps, but not with "user has big selection of multiple paragraphs and
+// wants to put them all in a bulleted list", which userSelectedBullet takes care of.
 
 //https://developer.apple.com/library/mac/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW1
 
@@ -42,7 +44,6 @@
 // removed first tab in lieu of using indents for bulleted lists
 
 @interface RichTextEditor () <NSTextViewDelegate> {
-    WZProtocolInterceptor *delegate_interceptor;
 }
 
 // Gets set to YES when the user starts changing attributes when there is no text selection (selecting bold, italic, etc)
@@ -67,6 +68,8 @@
 @property NSUInteger levelsOfUndo;
 
 @property BOOL inBulletedList;
+
+@property WZProtocolInterceptor *delegate_interceptor;
 
 @end
 
@@ -105,13 +108,13 @@
 }
 
 - (id)delegate {
-    return delegate_interceptor.receiver;
+    return self.delegate_interceptor.receiver;
 }
 
 - (void)setDelegate:(id)newDelegate {
     [super setDelegate:nil];
-    [delegate_interceptor setReceiver:newDelegate];
-    [super setDelegate:(id)delegate_interceptor];
+    [self.delegate_interceptor setReceiver:newDelegate];
+    [super setDelegate:(id)self.delegate_interceptor];
 }
 
 - (void)commonInitialization
@@ -119,9 +122,9 @@
     // Prevent the use of self.delegate = self
     // http://stackoverflow.com/questions/3498158/intercept-objective-c-delegate-messages-within-a-subclass
     Protocol *p = objc_getProtocol("NSTextViewDelegate");
-    delegate_interceptor = [[WZProtocolInterceptor alloc] initWithInterceptedProtocol:p];
-    [delegate_interceptor setMiddleMan:self];
-    [super setDelegate:(id)delegate_interceptor];
+    self.delegate_interceptor = [[WZProtocolInterceptor alloc] initWithInterceptedProtocol:p];
+    [self.delegate_interceptor setMiddleMan:self];
+    [super setDelegate:(id)self.delegate_interceptor];
     
     self.borderColor = [NSColor lightGrayColor];
     self.borderWidth = 1.0;
@@ -169,7 +172,7 @@
 }
 
 - (void)textViewDidChangeSelection:(NSNotification *)notification {
-    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
+//    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
     [self sendDelegateUpdate];
@@ -179,7 +182,7 @@
 }
 
 - (void)textDidChange:(NSNotification *)notification {
-    NSLog(@"[RTE] Text view changed");
+//    NSLog(@"[RTE] Text view changed");
     if (!self.isInTextDidChange)
     {
         self.isInTextDidChange = YES;
@@ -515,7 +518,7 @@
     } */
 }
 
-// Manually moves the cursor to the correct location. Ugly work around and weird but it works (at least in iOS 7 / OS X 10.11.2).
+// Manually ensures that the cursor is shown in the correct location. Ugly work around and weird but it works (at least in iOS 7 / OS X 10.11.2).
 // Basically what I do is add a " " with the correct indentation then delete it. For some reason with that
 // and applying that attribute to the current typing attributes it moves the cursor to the right place.
 -(void)setIndentationWithAttributes:(NSDictionary*)attributes paragraphStyle:(NSMutableParagraphStyle*)paragraphStyle atRange:(NSRange)range
@@ -979,6 +982,7 @@
     paragraphStyle.firstLineHeadIndent = 0;
     paragraphStyle.headIndent = 0;
     [self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:rangeOfParagraph];
+    [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:firstParagraphRange];
 }
 
 - (void)deleteBulletListWhenApplicable

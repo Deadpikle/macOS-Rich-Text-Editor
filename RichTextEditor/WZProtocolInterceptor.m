@@ -25,7 +25,6 @@ static inline BOOL selector_belongsToProtocol(SEL selector, Protocol * protocol)
 
 - (BOOL)respondsToSelector:(SEL)aSelector
 {
-    NSLog(@"Selector: %@", NSStringFromSelector(aSelector));
     if ([self.middleMan respondsToSelector:aSelector] &&
         [self isSelectorContainedInInterceptedProtocols:aSelector])
         return YES;
