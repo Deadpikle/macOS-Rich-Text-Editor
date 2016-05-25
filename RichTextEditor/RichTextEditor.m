@@ -66,6 +66,8 @@
 
 @property NSUInteger levelsOfUndo;
 
+@property BOOL inBulletedList;
+
 @end
 
 @implementation RichTextEditor
@@ -155,14 +157,18 @@
         [self.textStorage setAttributedString:[[NSAttributedString alloc] initWithString:@""]];
 }
 
--(BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
+- (BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
         return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
+    }
+    if ([replacementString isEqualToString:@"\n"])
+    {
+        self.inBulletedList = [self isInBulletedList];
     }
     return YES;
 }
 
--(void)textViewDidChangeSelection:(NSNotification *)notification {
+- (void)textViewDidChangeSelection:(NSNotification *)notification {
     NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
@@ -172,7 +178,7 @@
     }
 }
 
--(void)textDidChange:(NSNotification *)notification {
+- (void)textDidChange:(NSNotification *)notification {
     NSLog(@"[RTE] Text view changed");
     if (!self.isInTextDidChange)
     {
@@ -183,16 +189,14 @@
             [self.rteDelegate textViewChanged:nil];
         self.isInTextDidChange = NO;
     }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)]) {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)])
+    {
         [self.delegate textDidChange:notification];
     }
 }
 
--(void)dealloc {
-    
-}
-
-- (BOOL)isInBulletedList {
+- (BOOL)isInBulletedList
+{
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
 }
@@ -592,7 +596,7 @@
 	
 	__block NSInteger rangeOffset = 0;
     __block BOOL mustDecreaseIndentAfterRemovingBullet = NO;
-    __block BOOL isInBulletedList = NO;
+    __block BOOL isInBulletedList = self.inBulletedList;
 	[self enumarateThroughParagraphsInRange:self.selectedRange withBlock:^(NSRange paragraphRange){
 		NSRange range = NSMakeRange(paragraphRange.location + rangeOffset, paragraphRange.length);
 		NSMutableAttributedString *currentAttributedString = [self.attributedString mutableCopy];
@@ -618,6 +622,7 @@
 			
 			rangeOffset = rangeOffset - self.BULLET_STRING.length;
             mustDecreaseIndentAfterRemovingBullet = YES;
+            isInBulletedList = NO;
 		}
 		else
         {
@@ -930,8 +935,9 @@
     if (rangeOfCurrentParagraph.location == 0)
         return; // there isn't a previous paragraph, so forget it. The user isn't in a bulleted list.
 	NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location-1, 0)];
-    if (![self isInBulletedList])
+    if (!self.inBulletedList)
     { // fixes issue with backspacing into bullet list adding a bullet
+        NSLog(@"[RTE] NOT in a bulleted list.");
 		BOOL currentParagraphHasBullet = ([[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location]
                                            hasPrefix:self.BULLET_STRING]) ? YES : NO;
 		BOOL previousParagraphHasBullet = ([[self.attributedString.string substringFromIndex:rangeOfPreviousParagraph.location]
