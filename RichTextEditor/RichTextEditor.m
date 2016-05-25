@@ -221,11 +221,7 @@
     {
         NSDictionary *attributes = [self typingAttributes];
         NSFont *font = [attributes objectForKey:NSFontAttributeName];
-        //if (!font)
-        //    font = [self fontAtIndex:self.selectedRange.location];;
         NSColor *fontColor = [attributes objectForKey:NSForegroundColorAttributeName];
-        //fontColor = [fontColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace]; // NSDeviceRGBColorSpace?
-        //NSLog(@"R: %f, G: %f, B: %f", [fontColor redComponent], [fontColor greenComponent], [fontColor blueComponent]);
         NSColor *backgroundColor = [attributes objectForKey:NSBackgroundColorAttributeName]; // may want NSBackgroundColorAttributeName
         BOOL isInBulletedList = [self isInBulletedList];
         [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:isInBulletedList textBackgroundColor:backgroundColor textColor:fontColor];
@@ -527,6 +523,7 @@
 // Manually ensures that the cursor is shown in the correct location. Ugly work around and weird but it works (at least in iOS 7 / OS X 10.11.2).
 // Basically what I do is add a " " with the correct indentation then delete it. For some reason with that
 // and applying that attribute to the current typing attributes it moves the cursor to the right place.
+// Would updating the typing attributes also work instead? That'd certainly be cleaner...
 -(void)setIndentationWithAttributes:(NSDictionary*)attributes paragraphStyle:(NSMutableParagraphStyle*)paragraphStyle atRange:(NSRange)range
 {
     NSMutableAttributedString *space = [[NSMutableAttributedString alloc] initWithString:@" " attributes:attributes];
@@ -866,6 +863,7 @@
     return self.selectedRange.length > 0;
 }
 
+// By default, if this function is called with nothing selection, it will resize all text.
 -(void)changeFontSizeWithOperation:(CGFloat(^)(CGFloat currFontSize))operation {
     [self.textStorage beginEditing];
     NSRange range = self.selectedRange;
@@ -902,17 +900,45 @@
 }
 
 -(void)decreaseFontSize {
-    [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
-        return currFontSize - self.fontSizeChangeAmount;
-    }];
-    [self sendDelegateTVChanged];
+    if (self.selectedRange.length == 0)
+    {
+        NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
+        NSFont *font = [typingAttributes valueForKey:NSFontAttributeName];
+        CGFloat nextFontSize = font.pointSize - self.fontSizeChangeAmount;
+        if (nextFontSize < self.minFontSize)
+            nextFontSize = self.minFontSize;
+        NSFont *nextFont = [[NSFontManager sharedFontManager] convertFont:font toSize:nextFontSize];
+        [typingAttributes setValue:nextFont forKey:NSFontAttributeName];
+        self.typingAttributes = typingAttributes;
+    }
+    else
+    {
+        [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
+            return currFontSize - self.fontSizeChangeAmount;
+        }];
+        [self sendDelegateTVChanged]; // only send if the actual text changes -- if no text selected, no text has actually changed
+    }
 }
 
 -(void)increaseFontSize {
-    [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
-        return currFontSize + self.fontSizeChangeAmount;
-    }];
-    [self sendDelegateTVChanged];
+    if (self.selectedRange.length == 0)
+    {
+        NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
+        NSFont *font = [typingAttributes valueForKey:NSFontAttributeName];
+        CGFloat nextFontSize = font.pointSize + self.fontSizeChangeAmount;
+        if (nextFontSize > self.maxFontSize)
+            nextFontSize = self.maxFontSize;
+        NSFont *nextFont = [[NSFontManager sharedFontManager] convertFont:font toSize:nextFontSize];
+        [typingAttributes setValue:nextFont forKey:NSFontAttributeName];
+        self.typingAttributes = typingAttributes;
+    }
+    else
+    {
+        [self changeFontSizeWithOperation:^CGFloat (CGFloat currFontSize) {
+            return currFontSize + self.fontSizeChangeAmount;
+        }];
+        [self sendDelegateTVChanged]; // only send if the actual text changes -- if no text selected, no text has actually changed
+    }
 }
 
 // TODO: Fix this function. You can't create a font that isn't bold from a dictionary that has a bold attribute currently, since if you send isBold 0 [nil], it'll use the dictionary, which is bold!
