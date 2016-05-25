@@ -4,9 +4,11 @@
 //
 //  Created by Aryan Gh on 7/21/13.
 //  Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
+//  Heavily extended and improved for iOS and OS X by Deadpikle
+//  Copyright (c) 2016 Deadpikle. All rights reserved.
 //
-// https://github.com/aryaxt/iOS-Rich-Text-Editor
-// https://github.com/Deadpikle/iOS-and-Mac-OS-X-Rich-Text-Editor
+// https://github.com/aryaxt/iOS-Rich-Text-Editor -- Original
+// https://github.com/Deadpikle/iOS-and-Mac-OS-X-Rich-Text-Editor -- Fork
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +28,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Make sure to call removeTextObserverForDealloc before going away (forever) from the screen with the RTE
+// Make sure to call removeTextObserverForDealloc before going away (forever) from the screen with the RTE (TODO: We should find a better way for this and fix it!)
 
 // TODO: better documentation
+// TODO: Clean up, clean up, everybody do your share!
 
 #import <Cocoa/Cocoa.h>
 
@@ -40,9 +43,6 @@
 - (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEditor;
 - (NSUInteger)levelsOfUndo;
-- (BOOL)handlesUndoRedoForText;
-- (void)userPerformedUndo; // TODO: remove?
-- (void)userPerformedRedo; // TODO: remove?
 @end
 
 @protocol RichTextEditorDelegate <NSObject>
@@ -52,8 +52,12 @@
 -(void)userSelectionChanged:(NSRange)range isBold:(BOOL)isBold isItalic:(BOOL)isItalic isUnderline:(BOOL)isUnderline isInBulletedList:(BOOL)isInBulletedList textBackgroundColor:(NSColor*)textBackgroundColor textColor:(NSColor*)textColor;
 
 @optional
-
 -(void)textViewChanged:(NSNotification *)notification;
+-(BOOL)richTextEditor:(RichTextEditor*)editor keyDownEvent:(NSEvent*)event; // return YES if handled by delegate, NO if RTE should process it
+
+- (BOOL)handlesUndoRedoForText;
+- (void)userPerformedUndo; // TODO: remove?
+- (void)userPerformedRedo; // TODO: remove?
 
 @end
 
@@ -62,12 +66,11 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     ParagraphIndentationDecrease
 };
 
-@interface RichTextEditor : NSTextView <NSTextViewDelegate>
+@interface RichTextEditor : NSTextView
 
 @property (assign) IBOutlet id <RichTextEditorDataSource> rteDataSource;
 @property (assign) IBOutlet id <RichTextEditorDelegate> rteDelegate;
 @property (nonatomic, assign) CGFloat defaultIndentationSize;
-@property BOOL userInBulletList;
 
 // call these methods when the user does the given action (clicks bold button, etc.)
 - (void)userSelectedBold;
@@ -94,9 +97,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 - (BOOL)hasSelection; // convenience method; YES if user has something selected
 
 - (void)changeToAttributedString:(NSAttributedString*)string;
-
-- (void)addTextObserver;
-- (void)removeTextObserverForDealloc;
 
 - (void)setBorderColor:(NSColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;

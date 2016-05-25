@@ -1,5 +1,7 @@
 RichTextEditor -- Mac OS X
 ==================
+**NOTE: This repo is in desperate need of some help. Code needs cleaned up, and there are some issues with the RTE depending on setting itself to its own delegate in order to make things work properly. I haven't gotten the chance to do this myself. Please help!**
+
 MAC NOTES:
 -The Mac version has no toolbar or things like that. You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. for you. Some day, in a perfect world, I'll update this with a proper example. Rest assured, however, that I (Deadpikle) am using this code in a presentation software package for speaker notes rich text editing, and it works rather well.
 -You only need 6 files:

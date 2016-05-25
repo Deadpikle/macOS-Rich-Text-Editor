@@ -1,12 +1,14 @@
 //
-//  RichTextEditor.m
+//  RichTextEditor.h
 //  RichTextEdtor
 //
 //  Created by Aryan Gh on 7/21/13.
 //  Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
+//  Heavily extended and improved for iOS and OS X by Deadpikle
+//  Copyright (c) 2016 Deadpikle. All rights reserved.
 //
-// https://github.com/aryaxt/iOS-Rich-Text-Editor
-// https://github.com/Deadpikle/iOS-and-Mac-OS-X-Rich-Text-Editor
+// https://github.com/aryaxt/iOS-Rich-Text-Editor -- Original
+// https://github.com/Deadpikle/iOS-and-Mac-OS-X-Rich-Text-Editor -- Fork
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -26,14 +28,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+// May want to implement https://github.com/sweetmandm/Auto-List-Continuation-For-UITextView/blob/master/AutomaticBulletAndNumberLists.m
+
+//https://developer.apple.com/library/mac/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW1
+
 #import "RichTextEditor.h"
 #import <QuartzCore/QuartzCore.h>
 #import "NSFont+RichTextEditor.h"
 #import "NSAttributedString+RichTextEditor.h"
+#import "WZProtocolInterceptor.h"
+#import  <objc/runtime.h>
 
 // removed first tab in lieu of using indents for bulleted lists
 
-@interface RichTextEditor ()
+@interface RichTextEditor () <NSTextViewDelegate> {
+    WZProtocolInterceptor *delegate_interceptor;
+}
 
 // Gets set to YES when the user starts changing attributes when there is no text selection (selecting bold, italic, etc)
 // Gets set to NO  when the user changes selection or starts typing
@@ -92,15 +102,31 @@
 	return self;
 }
 
+- (id)delegate {
+    return delegate_interceptor.receiver;
+}
+
+- (void)setDelegate:(id)newDelegate {
+    [super setDelegate:nil];
+    [delegate_interceptor setReceiver:newDelegate];
+    [super setDelegate:(id)delegate_interceptor];
+}
+
 - (void)commonInitialization
 {
+    // Prevent the use of self.delegate = self
+    // http://stackoverflow.com/questions/3498158/intercept-objective-c-delegate-messages-within-a-subclass
+    Protocol *p = objc_getProtocol("NSTextViewDelegate");
+    delegate_interceptor = [[WZProtocolInterceptor alloc] initWithInterceptedProtocol:p];
+    [delegate_interceptor setMiddleMan:self];
+    [super setDelegate:(id)delegate_interceptor];
+    
     self.borderColor = [NSColor lightGrayColor];
     self.borderWidth = 1.0;
     
 	self.typingAttributesInProgress = NO;
-    self.userInBulletList = NO;
     self.isInTextDidChange = NO;
-    self.fontSizeChangeAmount = 2.0f;
+    self.fontSizeChangeAmount = 6.0f;
     self.maxFontSize = 128.0f;
     self.minFontSize = 10.0f;
     
@@ -121,21 +147,33 @@
         [[self undoManager] setLevelsOfUndo:[self.rteDataSource levelsOfUndo]];
     else
         [[self undoManager] setLevelsOfUndo:self.levelsOfUndo];
-	
-	// When text changes check to see if we need to add bullet, or delete bullet on backspace/enter
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewDidChangeSelection) name:NSTextViewDidChangeSelectionNotification object:nil];
-    [self setDelegate:self];
     
     // http://stackoverflow.com/questions/26454037/uitextview-text-selection-and-highlight-jumping-in-ios-8
     self.layoutManager.allowsNonContiguousLayout = NO;
     self.selectedRange = NSMakeRange(0, 0);
-    if ([self.string isEqualToString:@" "])
-        self.attributedString = [[NSAttributedString alloc] initWithString:@""];
+    if ([[self.string stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""] )
+        [self.textStorage setAttributedString:[[NSAttributedString alloc] initWithString:@""]];
 }
 
+-(BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
+        return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
+    }
+    return YES;
+}
+
+-(void)textViewDidChangeSelection:(NSNotification *)notification {
+    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
+    [self setNeedsLayout:YES];
+    [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
+    [self sendDelegateUpdate];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textViewDidChangeSelection:)]) {
+        [self.delegate textViewDidChangeSelection:notification];
+    }
+}
 
 -(void)textDidChange:(NSNotification *)notification {
-    //NSLog(@"Text view changed");
+    NSLog(@"[RTE] Text view changed");
     if (!self.isInTextDidChange)
     {
         self.isInTextDidChange = YES;
@@ -145,36 +183,24 @@
             [self.rteDelegate textViewChanged:nil];
         self.isInTextDidChange = NO;
     }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)]) {
+        [self.delegate textDidChange:notification];
+    }
 }
 
 -(void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
 }
 
-- (void)addTextObserver {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(textViewDidChangeSelection) name:NSTextViewDidChangeSelectionNotification object:nil];
+- (BOOL)isInBulletedList {
+    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
+    return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
 }
 
--(void)removeTextObserverForDealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-}
-
-- (void)textViewDidChangeSelection
-{
-    //NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
-    [self setNeedsLayout:YES];
-    [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
-	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
-	BOOL currentParagraphHasBullet = ([[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING]) ? YES: NO;
-    if (currentParagraphHasBullet)
-        self.userInBulletList = YES;
-    [self sendDelegateUpdate];
-}
-
-#pragma mark - Override Methods -
+#pragma mark -
 
 
--(void)sendDelegateUpdate
+- (void)sendDelegateUpdate
 {
     if (self.rteDelegate)
     {
@@ -186,7 +212,8 @@
         //fontColor = [fontColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace]; // NSDeviceRGBColorSpace?
         //NSLog(@"R: %f, G: %f, B: %f", [fontColor redComponent], [fontColor greenComponent], [fontColor blueComponent]);
         NSColor *backgroundColor = [attributes objectForKey:NSBackgroundColorAttributeName]; // may want NSBackgroundColorAttributeName
-        [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:self.userInBulletList textBackgroundColor:backgroundColor textColor:fontColor];
+        BOOL isInBulletedList = [self isInBulletedList];
+        [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:isInBulletedList textBackgroundColor:backgroundColor textColor:fontColor];
     }
 }
 
@@ -200,7 +227,7 @@
 {
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
     if (!font) {
-        
+        font = [NSFont systemFontOfSize:12.0f];
     }
     [self applyFontAttributesToSelectedRangeWithBoldTrait:[NSNumber numberWithBool:![font isBold]] italicTrait:nil fontName:nil fontSize:nil];
     [self sendDelegateUpdate];
@@ -261,10 +288,38 @@
     [self sendDelegateTVChanged];
 }
 
-
 - (void)userSelectedPageBreak:(NSString*)pageBreakString
 {
-    [self.textStorage insertAttributedString:[[NSAttributedString alloc] initWithString:pageBreakString attributes:[self typingAttributes]] atIndex:self.selectedRange.location];
+    NSMutableDictionary *pageBreakAttributes = [self.typingAttributes mutableCopy];
+    NSMutableDictionary *currentTypingAttributes = [self.typingAttributes mutableCopy];
+    NSMutableParagraphStyle *paragraphStyle = [[pageBreakAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
+    paragraphStyle.headIndent = 0;
+    paragraphStyle.firstLineHeadIndent = 0;
+   // paragraphStyle.lineSpacing = 0;
+    paragraphStyle.paragraphSpacingBefore = 0;
+    //paragraphStyle.lineHeightMultiple = 0;
+    paragraphStyle.maximumLineHeight = 16;
+    //paragraphStyle.paragraphSpacing = 16;
+    [pageBreakAttributes setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
+    NSFont *currFont = [pageBreakAttributes objectForKey:NSFontAttributeName];
+    NSFont *nextFont = [currFont fontWithBoldTrait:NO italicTrait:NO andSize:12.0f];
+    [pageBreakAttributes setObject:nextFont forKey:NSFontAttributeName];
+    // Setup newline string
+    //NSMutableParagraphStyle *newlineParagraphStyle = [[currentTypingAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
+    //newlineParagraphStyle.paragraphSpacingBefore = 16;
+   // [currentTypingAttributes setObject:newlineParagraphStyle forKey:NSParagraphStyleAttributeName];
+    NSAttributedString *newlineString = [[NSAttributedString alloc] initWithString:@"\n" attributes:currentTypingAttributes];
+    NSAttributedString *pageBreakAttrString = [[NSAttributedString alloc] initWithString:pageBreakString attributes:pageBreakAttributes];
+    
+    NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] init];
+    [mutableAttributedString appendAttributedString:newlineString];
+    [mutableAttributedString appendAttributedString:pageBreakAttrString];
+    [mutableAttributedString appendAttributedString:newlineString];
+    
+    [self.textStorage insertAttributedString:mutableAttributedString atIndex:self.selectedRange.location];
+    //asdasd
+    [self setTypingAttributes:currentTypingAttributes];
+    
     [self sendDelegateTVChanged];
 }
 
@@ -315,7 +370,7 @@
 +(NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString
 {
     @try {
-        NSError *error ;
+        NSError *error;
         NSData *data = [htmlString dataUsingEncoding:NSUTF8StringEncoding];
         NSAttributedString *str =
         [[NSAttributedString alloc] initWithData:data
@@ -369,11 +424,11 @@
 {
     @try {
         BOOL shouldUseUndoManager = YES;
-        if ([self.rteDataSource respondsToSelector:@selector(handlesUndoRedoForText)])
+        if ([self.rteDelegate respondsToSelector:@selector(handlesUndoRedoForText)] && [self.rteDelegate respondsToSelector:@selector(userPerformedUndo)])
         {
-            if ([self.rteDataSource handlesUndoRedoForText])
+            if ([self.rteDelegate handlesUndoRedoForText])
             {
-                [self.rteDataSource userPerformedUndo];
+                [self.rteDelegate userPerformedUndo];
                 shouldUseUndoManager = NO;
             }
         }
@@ -390,11 +445,11 @@
 {
     @try {
         BOOL shouldUseUndoManager = YES;
-        if ([self.rteDataSource respondsToSelector:@selector(handlesUndoRedoForText)])
+        if ([self.rteDelegate respondsToSelector:@selector(handlesUndoRedoForText)] && [self.rteDelegate respondsToSelector:@selector(userPerformedRedo)])
         {
-            if ([self.rteDataSource handlesUndoRedoForText])
+            if ([self.rteDelegate handlesUndoRedoForText])
             {
-                [self.rteDataSource userPerformedRedo];
+                [self.rteDelegate userPerformedRedo];
                 shouldUseUndoManager = NO;
             }
         }
@@ -510,7 +565,7 @@
 }
 
 -(void)setAttributedString:(NSAttributedString*)attributedString {
-    [[self textStorage] setAttributedString:attributedString];
+    [self.textStorage setAttributedString:attributedString];
 }
 
 // http://stackoverflow.com/questions/5810706/how-to-programmatically-add-bullet-list-to-nstextview might be useful to look at some day (or maybe not)
@@ -537,7 +592,7 @@
 	
 	__block NSInteger rangeOffset = 0;
     __block BOOL mustDecreaseIndentAfterRemovingBullet = NO;
-	
+    __block BOOL isInBulletedList = NO;
 	[self enumarateThroughParagraphsInRange:self.selectedRange withBlock:^(NSRange paragraphRange){
 		NSRange range = NSMakeRange(paragraphRange.location + rangeOffset, paragraphRange.length);
 		NSMutableAttributedString *currentAttributedString = [self.attributedString mutableCopy];
@@ -562,7 +617,6 @@
 			paragraphStyle.headIndent = 0;
 			
 			rangeOffset = rangeOffset - self.BULLET_STRING.length;
-            self.userInBulletList = NO;
             mustDecreaseIndentAfterRemovingBullet = YES;
 		}
 		else
@@ -605,14 +659,14 @@
 			paragraphStyle.headIndent = expectedStringSize.width;
 			
 			rangeOffset = rangeOffset + self.BULLET_STRING.length;
-            self.userInBulletList = YES;
+            isInBulletedList = YES;
 		}
         [self.textStorage addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:range];
 	}];
 	
 	// If paragraph is empty move cursor to front of bullet, so the user can start typing right away
     NSRange rangeForSelection;
-	if (rangeOfParagraphsInSelectedText.count == 1 && rangeOfCurrentParagraph.length == 0 && self.userInBulletList)
+	if (rangeOfParagraphsInSelectedText.count == 1 && rangeOfCurrentParagraph.length == 0 && isInBulletedList)
 	{
         rangeForSelection = NSMakeRange(rangeOfCurrentParagraph.location + self.BULLET_STRING.length, 0);
 	}
@@ -628,7 +682,6 @@
             rangeForSelection = NSMakeRange(fullRange.location, fullRange.length+rangeOffset);
 		}
     }
-    //NSLog(@"[RTE] Range for end of bullet: %lu, %lu", (unsigned long)rangeForSelection.location, (unsigned long)rangeForSelection.length);
     if (mustDecreaseIndentAfterRemovingBullet) // remove the extra indentation added by the bullet
         [self userSelectedParagraphIndentation:ParagraphIndentationDecrease];
     [self setSelectedRange:rangeForSelection];
@@ -692,6 +745,9 @@
         if (firstSelectionRangeValue)
         {
             NSRange firstCharacterOfSelectedRange = [firstSelectionRangeValue rangeValue];
+            if (firstCharacterOfSelectedRange.location >= self.textStorage.length) {
+                firstCharacterOfSelectedRange.location = self.textStorage.length - 1;
+            }
             NSDictionary *attributesDictionary = [self.textStorage attributesAtIndex:firstCharacterOfSelectedRange.location effectiveRange: NULL];
             [self setTypingAttributes: attributesDictionary];
         }
@@ -874,8 +930,7 @@
     if (rangeOfCurrentParagraph.location == 0)
         return; // there isn't a previous paragraph, so forget it. The user isn't in a bulleted list.
 	NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location-1, 0)];
-    //NSLog(@"[RTE] Is the user in the bullet list? %d", self.userInBulletList);
-    if (!self.userInBulletList)
+    if (![self isInBulletedList])
     { // fixes issue with backspacing into bullet list adding a bullet
 		BOOL currentParagraphHasBullet = ([[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location]
                                            hasPrefix:self.BULLET_STRING]) ? YES : NO;
@@ -918,7 +973,6 @@
     paragraphStyle.firstLineHeadIndent = 0;
     paragraphStyle.headIndent = 0;
     [self applyAttributes:paragraphStyle forKey:NSParagraphStyleAttributeName atRange:rangeOfParagraph];
-    self.userInBulletList = NO;
 }
 
 - (void)deleteBulletListWhenApplicable
@@ -941,7 +995,7 @@
                 // Get rid of bullet string
                 [self.textStorage deleteCharactersInRange:NSMakeRange(range.location-checkStringLength, checkStringLength)];
                 NSRange newRange = NSMakeRange(range.location-checkStringLength, 0);
-                [self setSelectedRange:newRange];
+                self.selectedRange = newRange;
                 
                 // Get rid of bullet indentation
                 [self removeBulletIndentation:newRange];
@@ -963,7 +1017,7 @@
                         NSRange rangeToDelete = NSMakeRange(rangeOfPreviousParagraph.location, rangeOfPreviousParagraph.length+rangeOfCurrentParagraph.length+1);
                         [self.textStorage deleteCharactersInRange:rangeToDelete];
                         NSRange newRange = NSMakeRange(rangeOfPreviousParagraph.location, 0);
-                        [self setSelectedRange:newRange];
+                        self.selectedRange = newRange;
                         // Get rid of bullet indentation
                         [self removeBulletIndentation:newRange];
                     }
@@ -977,6 +1031,10 @@
 
 // http://stackoverflow.com/questions/970707/cocoa-keyboard-shortcuts-in-dialog-without-an-edit-menu
 -(void)keyDown:(NSEvent*)event {
+    if (self.delegate && [self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])
+    {
+        return; // event was absorbed
+    }
     if ((event.modifierFlags & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask ||
         (event.modifierFlags & NSDeviceIndependentModifierFlagsMask) == (NSCommandKeyMask | NSAlphaShiftKeyMask))
     {
@@ -986,6 +1044,8 @@
             [self userSelectedItalic];
         else if ([[event charactersIgnoringModifiers] isEqualToString:@"u"])
             [self userSelectedUnderline];
+        else
+            [super keyDown:event];
     }
     else
         [super keyDown:event];
