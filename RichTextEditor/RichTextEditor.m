@@ -212,6 +212,15 @@
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
 }
 
+- (void)pasteAsPlainText:(id)sender {
+    // Apparently paste as "plain" text doesn't ignore background and foreground colors...
+    NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
+    [typingAttributes removeObjectForKey:NSBackgroundColorAttributeName];
+    [typingAttributes removeObjectForKey:NSForegroundColorAttributeName];
+    self.typingAttributes = typingAttributes;
+    [super pasteAsPlainText:sender];
+}
+
 #pragma mark -
 
 
