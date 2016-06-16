@@ -318,12 +318,14 @@
    // paragraphStyle.lineSpacing = 0;
     paragraphStyle.paragraphSpacingBefore = 0;
     //paragraphStyle.lineHeightMultiple = 0;
-    paragraphStyle.maximumLineHeight = 16;
+    //paragraphStyle.maximumLineHeight = 16;
     //paragraphStyle.paragraphSpacing = 16;
     [pageBreakAttributes setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
     NSFont *currFont = [pageBreakAttributes objectForKey:NSFontAttributeName];
-    NSFont *nextFont = [currFont fontWithBoldTrait:NO italicTrait:NO andSize:12.0f];
+    NSFont *nextFont = [currFont fontWithBoldTrait:NO italicTrait:NO andSize:currFont.pointSize];
+    
     [pageBreakAttributes setObject:nextFont forKey:NSFontAttributeName];
+    [pageBreakAttributes setValue:[NSNumber numberWithInteger:NSUnderlineStyleNone] forKey:NSUnderlineStyleAttributeName];
     // Setup newline string
     //NSMutableParagraphStyle *newlineParagraphStyle = [[currentTypingAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
     //newlineParagraphStyle.paragraphSpacingBefore = 16;
@@ -1083,7 +1085,7 @@
 
 // http://stackoverflow.com/questions/970707/cocoa-keyboard-shortcuts-in-dialog-without-an-edit-menu
 -(void)keyDown:(NSEvent*)event {
-    if (self.delegate && [self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])
+    if ([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])
     {
         return; // event was absorbed
     }
