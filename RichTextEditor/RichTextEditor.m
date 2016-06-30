@@ -138,7 +138,7 @@
     
     self.levelsOfUndo = 10;
     
-    self.BULLET_STRING = @"•  ";
+    self.BULLET_STRING = @"•\u00A0\u00A0";
     
     // Instead of hard-coding the default indentation size, which can make bulleted lists look a little
     // odd when increasing/decreasing their indent, use a \t character width instead
@@ -346,7 +346,7 @@
     NSMutableParagraphStyle *paragraphStyle = [[pageBreakAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
     paragraphStyle.headIndent = 0;
     paragraphStyle.firstLineHeadIndent = 0;
-   // paragraphStyle.lineSpacing = 0;
+    //paragraphStyle.lineSpacing = 0;
     paragraphStyle.paragraphSpacingBefore = 0;
     //paragraphStyle.lineHeightMultiple = 0;
     //paragraphStyle.maximumLineHeight = 16;
@@ -364,13 +364,29 @@
     NSAttributedString *newlineString = [[NSAttributedString alloc] initWithString:@"\n" attributes:currentTypingAttributes];
     NSAttributedString *pageBreakAttrString = [[NSAttributedString alloc] initWithString:pageBreakString attributes:pageBreakAttributes];
     
+    NSRange rangeOfCurrentParagraph = [self.textStorage firstParagraphRangeFromTextRange:self.selectedRange];
+    NSString *currentParagraph = [self.textStorage.string substringWithRange:rangeOfCurrentParagraph];
+    
     NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] init];
-    [mutableAttributedString appendAttributedString:newlineString];
+    // if current paragraph is blank, don't insert a newline before the page break text
+    if (![[currentParagraph stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]) {
+        [mutableAttributedString appendAttributedString:newlineString];
+    }
     [mutableAttributedString appendAttributedString:pageBreakAttrString];
-    [mutableAttributedString appendAttributedString:newlineString];
+    
+    // see if we need to insert another newline
+    // we do if the user inserted the page break in the middle of text, basically
+    // so if the rest of the paragraph trimmed is not empty, then insert a newline
+    // or if the selectedRange is at the end of the text, insert a newline
+    NSString *currParagraphAfterSelectedRange = [currentParagraph substringFromIndex:self.selectedRange.location - rangeOfCurrentParagraph.location];
+    currParagraphAfterSelectedRange = [currParagraphAfterSelectedRange stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+    if (![currParagraphAfterSelectedRange isEqualToString:@""] || self.selectedRange.location == self.textStorage.string.length) {
+        [mutableAttributedString appendAttributedString:newlineString];
+    }
     
     [self.textStorage insertAttributedString:mutableAttributedString atIndex:self.selectedRange.location];
-    //asdasd
+    
+    
     [self setTypingAttributes:currentTypingAttributes];
     
     [self sendDelegateTVChanged];
