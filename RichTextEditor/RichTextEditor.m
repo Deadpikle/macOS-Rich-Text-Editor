@@ -162,12 +162,17 @@
 }
 
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
-        return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
+    if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(previewTextChangeForRange:replacementString:)]) {
+        if ([self.rteDelegate previewTextChangeForRange:affectedCharRange replacementString:replacementString]) {
+            return NO; // rte delegate handled it
+        }
     }
     if ([replacementString isEqualToString:@"\n"])
     {
         self.inBulletedList = [self isInBulletedList];
+    }
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
+        return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
     }
     return YES;
 }

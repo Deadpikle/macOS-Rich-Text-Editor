@@ -52,6 +52,16 @@
 -(void)userSelectionChanged:(NSRange)range isBold:(BOOL)isBold isItalic:(BOOL)isItalic isUnderline:(BOOL)isUnderline isInBulletedList:(BOOL)isInBulletedList textBackgroundColor:(NSColor*)textBackgroundColor textColor:(NSColor*)textColor;
 
 @optional
+
+/**
+ *  
+ *
+ *  @param affectedCharRange <#affectedCharRange description#>
+ *  @param replacementString <#replacementString description#>
+ *
+ *  @return return YES if handled by delegate, NO if RTE should process it
+ */
+-(BOOL)previewTextChangeForRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
 -(void)textViewChanged:(NSNotification *)notification; // TODO: remove in favor of normal delegate
 -(BOOL)richTextEditor:(RichTextEditor*)editor keyDownEvent:(NSEvent*)event; // return YES if handled by delegate, NO if RTE should process it
 
