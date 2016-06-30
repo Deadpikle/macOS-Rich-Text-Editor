@@ -1085,24 +1085,43 @@
 
 // http://stackoverflow.com/questions/970707/cocoa-keyboard-shortcuts-in-dialog-without-an-edit-menu
 -(void)keyDown:(NSEvent*)event {
-    if ([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])
-    {
-        return; // event was absorbed
+    NSString *key = [event charactersIgnoringModifiers];
+    unichar keyChar = 0;
+    if ([key length] == 1) {
+        keyChar = [key characterAtIndex:0];
     }
-    if ((event.modifierFlags & NSDeviceIndependentModifierFlagsMask) == NSCommandKeyMask ||
-        (event.modifierFlags & NSDeviceIndependentModifierFlagsMask) == (NSCommandKeyMask | NSAlphaShiftKeyMask))
-    {
-        if ([[event charactersIgnoringModifiers] isEqualToString:@"b"])
-            [self userSelectedBold];
-        else if ([[event charactersIgnoringModifiers] isEqualToString:@"i"])
-            [self userSelectedItalic];
-        else if ([[event charactersIgnoringModifiers] isEqualToString:@"u"])
-            [self userSelectedUnderline];
-        else
-            [super keyDown:event];
+    bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
+    bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
+    if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown) {
+        [self userSelectedBold];
     }
-    else
+    else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown) {
+        [self userSelectedItalic];
+    }
+    else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown) {
+        [self userSelectedUnderline];
+    }
+    else if (keyChar == '>' && shiftKeyDown && commandKeyDown) {
+        [self increaseFontSize];
+    }
+    else if (keyChar == '<' && shiftKeyDown && commandKeyDown) {
+        [self decreaseFontSize];
+    }
+    else if (keyChar == 'L' && shiftKeyDown && commandKeyDown) {
+        [self userSelectedBullet];
+    }
+    else if (keyChar == 'N' && shiftKeyDown && commandKeyDown && [self isInBulletedList]) {
+        [self userSelectedBullet];
+    }
+    else if (keyChar == 'T' && shiftKeyDown && commandKeyDown) {
+        [self userSelectedDecreaseIndent];
+    }
+    else if (keyChar == 't' && commandKeyDown) {
+        [self userSelectedIncreaseIndent];
+    }
+    else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
         [super keyDown:event];
+    }
 }
 
 @end
