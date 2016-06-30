@@ -172,6 +172,32 @@
     return YES;
 }
 
+// http://stackoverflow.com/questions/2484072/how-can-i-make-the-tab-key-move-focus-out-of-a-nstextview
+- (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector
+{
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:doCommandBySelector:)])
+    {
+        return [self.delegate textView:aTextView doCommandBySelector:aSelector];
+    }
+    if (aSelector == @selector(insertTab:))
+    {
+        if ([self isInEmptyBulletedListItem])
+        {
+            [self userSelectedIncreaseIndent];
+            return YES;
+        }
+    }
+    else if (aSelector == @selector(insertBacktab:))
+    {
+        if ([self isInEmptyBulletedListItem])
+        {
+            [self userSelectedDecreaseIndent];
+            return YES;
+        }
+    }
+    return NO;
+}
+
 -(void)deleteBackward:(id)sender {
     self.justDeletedBackward = YES;
     [super deleteBackward:sender];
@@ -210,6 +236,11 @@
 {
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
+}
+
+-(BOOL)isInEmptyBulletedListItem {
+    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
+    return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] isEqualToString:self.BULLET_STRING];
 }
 
 - (void)pasteAsPlainText:(id)sender {
@@ -1085,41 +1116,44 @@
 
 // http://stackoverflow.com/questions/970707/cocoa-keyboard-shortcuts-in-dialog-without-an-edit-menu
 -(void)keyDown:(NSEvent*)event {
-    NSString *key = [event charactersIgnoringModifiers];
-    unichar keyChar = 0;
-    if ([key length] == 1) {
+    NSString *key = event.charactersIgnoringModifiers;
+    if (key.length > 0) {
+        unichar keyChar = 0;
+        bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
+        bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
         keyChar = [key characterAtIndex:0];
+        if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown) {
+            [self userSelectedBold];
+        }
+        else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown) {
+            [self userSelectedItalic];
+        }
+        else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown) {
+            [self userSelectedUnderline];
+        }
+        else if (keyChar == '>' && shiftKeyDown && commandKeyDown) {
+            [self increaseFontSize];
+        }
+        else if (keyChar == '<' && shiftKeyDown && commandKeyDown) {
+            [self decreaseFontSize];
+        }
+        else if (keyChar == 'L' && shiftKeyDown && commandKeyDown) {
+            [self userSelectedBullet];
+        }
+        else if (keyChar == 'N' && shiftKeyDown && commandKeyDown && [self isInBulletedList]) {
+            [self userSelectedBullet];
+        }
+        else if (keyChar == 'T' && shiftKeyDown && commandKeyDown) {
+            [self userSelectedDecreaseIndent];
+        }
+        else if (keyChar == 't' && commandKeyDown) {
+            [self userSelectedIncreaseIndent];
+        }
+        else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
+            [super keyDown:event];
+        }
     }
-    bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
-    bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
-    if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown) {
-        [self userSelectedBold];
-    }
-    else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown) {
-        [self userSelectedItalic];
-    }
-    else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown) {
-        [self userSelectedUnderline];
-    }
-    else if (keyChar == '>' && shiftKeyDown && commandKeyDown) {
-        [self increaseFontSize];
-    }
-    else if (keyChar == '<' && shiftKeyDown && commandKeyDown) {
-        [self decreaseFontSize];
-    }
-    else if (keyChar == 'L' && shiftKeyDown && commandKeyDown) {
-        [self userSelectedBullet];
-    }
-    else if (keyChar == 'N' && shiftKeyDown && commandKeyDown && [self isInBulletedList]) {
-        [self userSelectedBullet];
-    }
-    else if (keyChar == 'T' && shiftKeyDown && commandKeyDown) {
-        [self userSelectedDecreaseIndent];
-    }
-    else if (keyChar == 't' && commandKeyDown) {
-        [self userSelectedIncreaseIndent];
-    }
-    else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
+    else {
         [super keyDown:event];
     }
 }
