@@ -14,6 +14,51 @@ MAC NOTES:
 
 -Forked by Deadpikle for additional fixes and features. Readme updates TODO. There have been many enhancements and improvements. Please bug me for an updated README if I forget, which I probably will. The code is by no means perfectly clean, but it does function! Be wary of using the stock undo/redo with bulleted lists —- it often fails. Also, I have no idea how CocoaPods updates with forks work, so if someone needs me to do that, please point me in the right direction…-
 
+Scaling Text [TODO: move to Wiki]
+
+If you want to scale text, you can use code similar to the following (based on http://stackoverflow.com/a/14113905/3938401):
+```
+// http://stackoverflow.com/a/14113905/3938401
+@interface ...
+@property CGFloat scaleFactor;
+@end
+
+@implementation ...
+
+-(void)viewDidLoad {
+    self.scaleFactor = 1.0f;
+    ...
+}
+
+- (void)setScaleFactor:(CGFloat)newScaleFactor adjustPopup:(BOOL)flag {
+    CGFloat oldScaleFactor = self.scaleFactor;
+    if (self.scaleFactor != newScaleFactor) {
+        NSSize curDocFrameSize, newDocBoundsSize;
+        NSView *clipView = [self.notesTextView superview];
+        self.scaleFactor = newScaleFactor;
+        // Get the frame. The frame must stay the same.
+        curDocFrameSize = [clipView frame].size;
+        // The new bounds will be frame divided by scale factor
+        newDocBoundsSize.width = curDocFrameSize.width / self.scaleFactor;
+        newDocBoundsSize.height = curDocFrameSize.height / self.scaleFactor;
+    }
+    self.scaleFactor = newScaleFactor;
+    [self scaleChanged:oldScaleFactor newScale:newScaleFactor];
+}
+
+- (void)scaleChanged:(CGFloat)oldScale newScale:(CGFloat)newScale {
+    CGFloat scaler = newScale / oldScale;
+    [self.notesTextView scaleUnitSquareToSize:NSMakeSize(scaler, scaler)];
+    // For some reason, even after ensuring the layout and displaying, the wrapping doesn't update until text is messed
+    // with. This workaround "fixes" that. Since we need it anyway, I removed the ensureLayoutForTextContainer:
+    // (from the SO post) and the documentation-implied [self.notesTextView display] calls.
+    [[self.notesTextView textStorage] appendAttributedString:[[NSAttributedString alloc] initWithString:@""]];
+}
+
+@end
+```
+
+
 
 RichTextEditor for iPhone &amp; iPad
 
