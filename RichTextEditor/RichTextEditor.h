@@ -53,16 +53,6 @@
 
 @optional
 
-/**
- *  
- *
- *  @param affectedCharRange <#affectedCharRange description#>
- *  @param replacementString <#replacementString description#>
- *
- *  @return return YES if handled by delegate, NO if RTE should process it
- */
--(BOOL)previewTextChangeForRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString;
--(void)textViewChanged:(NSNotification *)notification; // TODO: remove in favor of normal delegate
 -(BOOL)richTextEditor:(RichTextEditor*)editor keyDownEvent:(NSEvent*)event; // return YES if handled by delegate, NO if RTE should process it
 
 - (BOOL)handlesUndoRedoForText;

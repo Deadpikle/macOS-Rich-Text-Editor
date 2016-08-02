@@ -166,11 +166,6 @@
     {
         self.inBulletedList = [self isInBulletedList];
     }
-    if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(previewTextChangeForRange:replacementString:)]) {
-        if ([self.rteDelegate previewTextChangeForRange:affectedCharRange replacementString:replacementString]) {
-            return NO; // rte delegate handled it
-        }
-    }
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
         return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
     }
@@ -226,8 +221,6 @@
         if (!self.justDeletedBackward) // fix for issue where deleting a char that isn't in a bulleted list right before a bulleted list added a bullet
             [self applyBulletListIfApplicable];
         [self deleteBulletListWhenApplicable];
-        if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
-            [self.rteDelegate textViewChanged:nil];
         self.isInTextDidChange = NO;
     }
     self.justDeletedBackward = NO;
@@ -275,8 +268,10 @@
 
 -(void)sendDelegateTVChanged
 {
-    if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
-        [self.rteDelegate textViewChanged:nil];
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)])
+    {
+        [self.delegate textDidChange:[NSNotification notificationWithName:@"textDidChange:" object:self]];
+    }
 }
 
 -(void)userSelectedBold
@@ -649,10 +644,7 @@
         return;
     if (!self.isInTextDidChange)
     {
-        if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(textViewChanged:)])
-        {
-            [self.rteDelegate textViewChanged:nil];
-        }
+        [self sendDelegateTVChanged];
     }
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
