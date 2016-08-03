@@ -1177,6 +1177,10 @@
         bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
         bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
         keyChar = [key characterAtIndex:0];
+        if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
+            keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
+            [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
+        }
         if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown) {
             [self userSelectedBold];
         }
@@ -1203,11 +1207,6 @@
         }
         else if (keyChar == 't' && commandKeyDown) {
             [self userSelectedIncreaseIndent];
-        }
-        else if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
-                 keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
-            [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
-            [super keyDown:event];
         }
         else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
             [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeKeyDown];
