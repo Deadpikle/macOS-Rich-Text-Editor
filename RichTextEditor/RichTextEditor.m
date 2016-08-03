@@ -164,7 +164,12 @@
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
     if ([replacementString isEqualToString:@"\n"])
     {
+        [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeEnter];
         self.inBulletedList = [self isInBulletedList];
+    }
+    if ([replacementString isEqualToString:@" "])
+    {
+        [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeSpace];
     }
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
         return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
@@ -207,7 +212,7 @@
 //    NSLog(@"[RTE] Changed selection to location: %lu, length: %lu", (unsigned long)self.selectedRange.location, (unsigned long)self.selectedRange.length);
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
-    [self sendDelegateUpdate];
+    [self sendDelegateTypingAttrsUpdate];
     if (self.delegate && [self.delegate respondsToSelector:@selector(textViewDidChangeSelection:)]) {
         [self.delegate textViewDidChangeSelection:notification];
     }
@@ -236,12 +241,15 @@
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
 }
 
--(BOOL)isInEmptyBulletedListItem {
+-(BOOL)isInEmptyBulletedListItem
+{
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] isEqualToString:self.BULLET_STRING];
 }
 
-- (void)pasteAsPlainText:(id)sender {
+- (void)pasteAsPlainText:(id)sender
+{
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangePaste];
     // Apparently paste as "plain" text doesn't ignore background and foreground colors...
     NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
     [typingAttributes removeObjectForKey:NSBackgroundColorAttributeName];
@@ -250,10 +258,15 @@
     [super pasteAsPlainText:sender];
 }
 
+- (void)cut:(id)sender {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeCut];
+    [super cut:sender];
+}
+
 #pragma mark -
 
 
-- (void)sendDelegateUpdate
+- (void)sendDelegateTypingAttrsUpdate
 {
     if (self.rteDelegate)
     {
@@ -274,22 +287,32 @@
     }
 }
 
+-(void)sendDelegatePreviewChangeOfType:(RichTextEditorPreviewChange)type
+{
+    if (self.rteDelegate && [self.rteDelegate respondsToSelector:@selector(richTextEditor:changeAboutToOccurOfType:)])
+    {
+        [self.rteDelegate richTextEditor:self changeAboutToOccurOfType:type];
+    }
+}
+
 -(void)userSelectedBold
 {
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
     if (!font) {
         font = [NSFont systemFontOfSize:12.0f];
     }
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBold];
     [self applyFontAttributesToSelectedRangeWithBoldTrait:[NSNumber numberWithBool:![font isBold]] italicTrait:nil fontName:nil fontSize:nil];
-    [self sendDelegateUpdate];
+    [self sendDelegateTypingAttrsUpdate];
     [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedItalic
 {
     NSFont *font = [[self typingAttributes] objectForKey:NSFontAttributeName];
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeItalic];
     [self applyFontAttributesToSelectedRangeWithBoldTrait:nil italicTrait:[NSNumber numberWithBool:![font isItalic]] fontName:nil fontSize:nil];
-    [self sendDelegateUpdate];
+    [self sendDelegateTypingAttrsUpdate];
     [self sendDelegateTVChanged];
 }
 
@@ -301,24 +324,28 @@
     else
         existingUnderlineStyle = [NSNumber numberWithInteger:NSUnderlineStyleNone];
     
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeUnderline];
     [self applyAttributesToSelectedRange:existingUnderlineStyle forKey:NSUnderlineStyleAttributeName];
-    [self sendDelegateUpdate];
+    [self sendDelegateTypingAttrsUpdate];
     [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedIncreaseIndent
 {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeIndentIncrease];
     [self userSelectedParagraphIndentation:ParagraphIndentationIncrease];
     [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedDecreaseIndent {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeIndentDecrease];
     [self userSelectedParagraphIndentation:ParagraphIndentationDecrease];
     [self sendDelegateTVChanged];
 }
 
 -(void)userSelectedTextBackgroundColor:(NSColor*)color
 {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeHighlight];
     NSRange selectedRange = [self selectedRange];
     if (color)
         [self applyAttributesToSelectedRange:color forKey:NSBackgroundColorAttributeName];
@@ -330,6 +357,7 @@
 
 -(void)userSelectedTextColor:(NSColor*)color
 {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeFontColor];
     NSRange selectedRange = [self selectedRange];
     if (color)
         [self applyAttributesToSelectedRange:color forKey:NSForegroundColorAttributeName];
@@ -341,6 +369,7 @@
 
 - (void)userSelectedPageBreak:(NSString*)pageBreakString
 {
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangePageBreak];
     NSMutableDictionary *pageBreakAttributes = [self.typingAttributes mutableCopy];
     NSMutableDictionary *currentTypingAttributes = [self.typingAttributes mutableCopy];
     NSMutableParagraphStyle *paragraphStyle = [[pageBreakAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
@@ -646,6 +675,7 @@
     {
         [self sendDelegateTVChanged];
     }
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
@@ -954,7 +984,9 @@
     [self updateTypingAttributes];
 }
 
--(void)decreaseFontSize {
+- (void)decreaseFontSize
+{
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeFontSize];
     if (self.selectedRange.length == 0)
     {
         NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
@@ -975,7 +1007,9 @@
     }
 }
 
--(void)increaseFontSize {
+- (void)increaseFontSize
+{
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeFontSize];
     if (self.selectedRange.length == 0)
     {
         NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
@@ -1089,6 +1123,7 @@
             if (((int)(range.location-checkStringLength) >= 0 &&
                  [[self.attributedString.string substringFromIndex:range.location-checkStringLength] hasPrefix:checkString]))
             {
+                [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
                 //NSLog(@"[RTE] Getting rid of a bullet due to backspace while in empty bullet paragraph.");
                 // Get rid of bullet string
                 [self.textStorage deleteCharactersInRange:NSMakeRange(range.location-checkStringLength, checkStringLength)];
@@ -1111,6 +1146,7 @@
                     // Since it gets here AFTER it adds a new bullet
                     if ([[self.attributedString.string substringWithRange:rangeOfPreviousParagraph] hasSuffix:self.BULLET_STRING])
                     {
+                        [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
                         //NSLog(@"[RTE] Getting rid of bullets due to user hitting enter.");
                         NSRange rangeToDelete = NSMakeRange(rangeOfPreviousParagraph.location, rangeOfPreviousParagraph.length+rangeOfCurrentParagraph.length+1);
                         [self.textStorage deleteCharactersInRange:rangeToDelete];
@@ -1123,6 +1159,12 @@
             }
         }
 	}
+}
+
+-(void)mouseDown:(NSEvent *)theEvent {
+    NSLog(@"[RTE] Mouse down!");
+    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeMouseDown];
+    [super mouseDown:theEvent];
 }
 
 #pragma mark - Keyboard Shortcuts
@@ -1162,7 +1204,13 @@
         else if (keyChar == 't' && commandKeyDown) {
             [self userSelectedIncreaseIndent];
         }
+        else if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
+                 keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
+            [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
+            [super keyDown:event];
+        }
         else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
+            [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeKeyDown];
             [super keyDown:event];
         }
     }

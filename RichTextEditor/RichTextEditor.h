@@ -45,6 +45,28 @@
 - (NSUInteger)levelsOfUndo;
 @end
 
+
+typedef NS_ENUM(NSInteger, RichTextEditorPreviewChange) {
+    RichTextEditorPreviewChangeBold,
+    RichTextEditorPreviewChangeItalic,
+    RichTextEditorPreviewChangeUnderline,
+    RichTextEditorPreviewChangeFontResize,
+    RichTextEditorPreviewChangeHighlight,
+    RichTextEditorPreviewChangeFontSize,
+    RichTextEditorPreviewChangeFontColor,
+    RichTextEditorPreviewChangeIndentIncrease,
+    RichTextEditorPreviewChangeIndentDecrease,
+    RichTextEditorPreviewChangeCut,
+    RichTextEditorPreviewChangePaste,
+    RichTextEditorPreviewChangePageBreak,
+    RichTextEditorPreviewChangeSpace,
+    RichTextEditorPreviewChangeEnter,
+    RichTextEditorPreviewChangeBullet,
+    RichTextEditorPreviewChangeMouseDown,
+    RichTextEditorPreviewChangeArrowKey,
+    RichTextEditorPreviewChangeKeyDown
+};
+
 @protocol RichTextEditorDelegate <NSObject>
 
 @required
@@ -53,11 +75,13 @@
 
 @optional
 
--(BOOL)richTextEditor:(RichTextEditor*)editor keyDownEvent:(NSEvent*)event; // return YES if handled by delegate, NO if RTE should process it
+- (BOOL)richTextEditor:(RichTextEditor*)editor keyDownEvent:(NSEvent*)event; // return YES if handled by delegate, NO if RTE should process it
 
 - (BOOL)handlesUndoRedoForText;
 - (void)userPerformedUndo; // TODO: remove?
 - (void)userPerformedRedo; // TODO: remove?
+
+- (void)richTextEditor:(RichTextEditor*)editor changeAboutToOccurOfType:(RichTextEditorPreviewChange)type;
 
 @end
 
