@@ -1162,7 +1162,6 @@
 }
 
 -(void)mouseDown:(NSEvent *)theEvent {
-    NSLog(@"[RTE] Mouse down!");
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeMouseDown];
     [super mouseDown:theEvent];
 }
