@@ -275,7 +275,7 @@
         NSColor *fontColor = [attributes objectForKey:NSForegroundColorAttributeName];
         NSColor *backgroundColor = [attributes objectForKey:NSBackgroundColorAttributeName]; // may want NSBackgroundColorAttributeName
         BOOL isInBulletedList = [self isInBulletedList];
-        [self.rteDelegate userSelectionChanged:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:isInBulletedList textBackgroundColor:backgroundColor textColor:fontColor];
+        [self.rteDelegate selectionForEditor:self changedTo:[self selectedRange] isBold:[font isBold] isItalic:[font isItalic] isUnderline:[self isCurrentFontUnderlined] isInBulletedList:isInBulletedList textBackgroundColor:backgroundColor textColor:fontColor];
     }
 }
 
