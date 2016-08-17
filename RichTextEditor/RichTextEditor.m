@@ -200,6 +200,14 @@
             return YES;
         }
     }
+	else if (aSelector == @selector(deleteForward:)) {
+		// Do something against DELETE key
+		[self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeDelete];
+	}
+	else if (aSelector == @selector(deleteBackward:)) {
+		// Do something against BACKSPACE key
+		[self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeDelete];
+	}
     return NO;
 }
 
