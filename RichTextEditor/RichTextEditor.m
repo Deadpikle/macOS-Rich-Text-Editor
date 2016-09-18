@@ -41,6 +41,17 @@
 #import "WZProtocolInterceptor.h"
 #import  <objc/runtime.h>
 
+/*
+ TODO:
+ -cleanup
+ -use if {
+	 } syntax rather than
+	 if 
+	 {
+	 }
+	 syntax
+ */
+
 // removed first tab in lieu of using indents for bulleted lists
 
 @interface RichTextEditor () <NSTextViewDelegate> {
@@ -75,6 +86,10 @@
 @end
 
 @implementation RichTextEditor
+
++(NSString*)pasteboardDataType {
+	return @"macOSRichTextEditor57";
+}
 
 #pragma mark - Initialization -
 
@@ -126,7 +141,8 @@
     self.delegate_interceptor = [[WZProtocolInterceptor alloc] initWithInterceptedProtocol:p];
     [self.delegate_interceptor setMiddleMan:self];
     [super setDelegate:(id)self.delegate_interceptor];
-    
+	self.allowsRichTextPasteOnlyFromThisClass = YES;
+	
     self.borderColor = [NSColor lightGrayColor];
     self.borderWidth = 1.0;
     
@@ -255,20 +271,66 @@
     return [[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] isEqualToString:self.BULLET_STRING];
 }
 
+- (void)paste:(id)sender
+{
+	[self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangePaste];
+	if (self.allowsRichTextPasteOnlyFromThisClass)
+	{
+		if ([[NSPasteboard generalPasteboard] dataForType:[RichTextEditor pasteboardDataType]])
+		{
+			[super paste:sender]; // just call paste so we don't have to bother doing the check again
+		}
+		else
+		{
+			[self pasteAsPlainText:self];
+		}
+	}
+	else
+	{
+		[super paste:sender];
+	}
+}
+
+- (void)pasteAsRichText:(id)sender
+{
+	BOOL hasCopyDataFromThisClass = [[NSPasteboard generalPasteboard] dataForType:[RichTextEditor pasteboardDataType]] != nil;
+	if (self.allowsRichTextPasteOnlyFromThisClass)
+	{
+		if (hasCopyDataFromThisClass)
+		{
+			[super pasteAsRichText:sender];
+		}
+		else
+		{
+			[self pasteAsPlainText:sender];
+		}
+	}
+	else
+	{
+		[super pasteAsRichText:sender];
+	}
+}
+
 - (void)pasteAsPlainText:(id)sender
 {
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangePaste];
-    // Apparently paste as "plain" text doesn't ignore background and foreground colors...
-    NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
-    [typingAttributes removeObjectForKey:NSBackgroundColorAttributeName];
-    [typingAttributes removeObjectForKey:NSForegroundColorAttributeName];
-    self.typingAttributes = typingAttributes;
-    [super pasteAsPlainText:sender];
+	// Apparently paste as "plain" text doesn't ignore background and foreground colors...
+	NSMutableDictionary *typingAttributes = [self.typingAttributes mutableCopy];
+	[typingAttributes removeObjectForKey:NSBackgroundColorAttributeName];
+	[typingAttributes removeObjectForKey:NSForegroundColorAttributeName];
+	self.typingAttributes = typingAttributes;
+	[super pasteAsPlainText:sender];
 }
 
 - (void)cut:(id)sender {
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeCut];
     [super cut:sender];
+}
+
+-(void)copy:(id)sender {
+	[super copy:sender];
+	NSPasteboard *currentPasteboard = [NSPasteboard generalPasteboard];
+	[currentPasteboard setData:[@"" dataUsingEncoding:NSUTF8StringEncoding] forType:[RichTextEditor pasteboardDataType]];
 }
 
 #pragma mark -
