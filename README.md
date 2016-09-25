@@ -15,6 +15,8 @@ Based upon the Rich Text Editor at [here](https://github.com/Deadpikle/iOS-Rich-
 
 ### TODO
 
+- [ ] Convert to tabs instead of spaces
+- [ ] Starting bracket for function/conditional on same line as function name or conditional instead of next line
 - [ ] Create an example
 - [ ] Show how to call/use from Swift 3
 - [ ] Get this on Cocoapods
