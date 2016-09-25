@@ -4,11 +4,11 @@
 //
 //  Created by Aryan Gh on 7/21/13.
 //  Copyright (c) 2013 Aryan Ghassemi. All rights reserved.
-//  Heavily modified for iOS and OS X by Deadpikle
+//  Heavily modified for macOS by Deadpikle
 //  Copyright (c) 2016 Deadpikle. All rights reserved.
 //
 // https://github.com/aryaxt/iOS-Rich-Text-Editor -- Original
-// https://github.com/Deadpikle/iOS-and-Mac-OS-X-Rich-Text-Editor -- Fork
+// https://github.com/Deadpikle/macOS-Rich-Text-Editor -- Fork
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
