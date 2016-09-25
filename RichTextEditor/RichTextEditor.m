@@ -129,7 +129,7 @@
 
 - (void)setDelegate:(id)newDelegate {
     [super setDelegate:nil];
-    [self.delegate_interceptor setReceiver:newDelegate];
+	self.delegate_interceptor.receiver = newDelegate;
     [super setDelegate:(id)self.delegate_interceptor];
 }
 
