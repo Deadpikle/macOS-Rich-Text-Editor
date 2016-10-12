@@ -140,7 +140,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
+
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
+
++ (NSString *)convertPreviewChangeTypeToString:(RichTextEditorPreviewChange)changeType withNonSpecialChangeText:(BOOL)shouldReturnStringForNonSpecialType;
 
 @end
