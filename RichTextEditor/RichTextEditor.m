@@ -1300,13 +1300,13 @@
             keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
             [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
         }
-        if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown) {
+        if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown && !shiftKeyDown) {
             [self userSelectedBold];
         }
-        else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown) {
+        else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown && !shiftKeyDown) {
             [self userSelectedItalic];
         }
-        else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown) {
+        else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown && !shiftKeyDown) {
             [self userSelectedUnderline];
         }
         else if (keyChar == '>' && shiftKeyDown && commandKeyDown) {
@@ -1324,7 +1324,7 @@
         else if (keyChar == 'T' && shiftKeyDown && commandKeyDown) {
             [self userSelectedDecreaseIndent];
         }
-        else if (keyChar == 't' && commandKeyDown) {
+        else if (keyChar == 't' && commandKeyDown && !shiftKeyDown) {
             [self userSelectedIncreaseIndent];
         }
         else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
