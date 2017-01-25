@@ -154,7 +154,7 @@
     
     self.levelsOfUndo = 10;
     
-    self.BULLET_STRING = @"•\u00A0";
+    self.BULLET_STRING = @"•\u00A0"; // bullet is \u2022
     
     // Instead of hard-coding the default indentation size, which can make bulleted lists look a little
     // odd when increasing/decreasing their indent, use a \t character width instead
