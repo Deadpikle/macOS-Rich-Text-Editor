@@ -389,11 +389,12 @@
 -(void)userSelectedUnderline
 {
     NSNumber *existingUnderlineStyle;
-    if (![self isCurrentFontUnderlined])
+	if (![self isCurrentFontUnderlined]) {
         existingUnderlineStyle = [NSNumber numberWithInteger:NSUnderlineStyleSingle];
-    else
+	}
+	else {
         existingUnderlineStyle = [NSNumber numberWithInteger:NSUnderlineStyleNone];
-    
+	}
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeUnderline];
     [self applyAttributesToSelectedRange:existingUnderlineStyle forKey:NSUnderlineStyleAttributeName];
     [self sendDelegateTypingAttrsUpdate];
@@ -417,10 +418,12 @@
 {
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeHighlight];
     NSRange selectedRange = [self selectedRange];
-    if (color)
+	if (color) {
         [self applyAttributesToSelectedRange:color forKey:NSBackgroundColorAttributeName];
-    else
+	}
+	else {
         [self removeAttributeForKeyFromSelectedRange:NSBackgroundColorAttributeName];
+	}
     [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
     [self sendDelegateTVChanged];
 }
@@ -749,7 +752,7 @@
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
-	BOOL firstParagraphHasBullet = ([[[self.attributedString string] substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING]) ? YES: NO;
+	BOOL firstParagraphHasBullet = [[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
     
     NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location-1, 0)];
     NSDictionary *prevParaDict = [self dictionaryAtIndex:rangeOfPreviousParagraph.location];
@@ -760,14 +763,13 @@
     __block BOOL isInBulletedList = self.inBulletedList;
 	[self enumarateThroughParagraphsInRange:self.selectedRange withBlock:^(NSRange paragraphRange){
 		NSRange range = NSMakeRange(paragraphRange.location + rangeOffset, paragraphRange.length);
-		NSMutableAttributedString *currentAttributedString = [self.attributedString mutableCopy];
 		NSDictionary *dictionary = [self dictionaryAtIndex:MAX((int)range.location-1, 0)];
 		NSMutableParagraphStyle *paragraphStyle = [[dictionary objectForKey:NSParagraphStyleAttributeName] mutableCopy];
 		
 		if (!paragraphStyle)
 			paragraphStyle = [[NSMutableParagraphStyle alloc] init];
 		
-		BOOL currentParagraphHasBullet = ([[[currentAttributedString string] substringFromIndex:range.location] hasPrefix:self.BULLET_STRING]) ? YES : NO;
+		BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:range.location] hasPrefix:self.BULLET_STRING];
 		
 		if (firstParagraphHasBullet != currentParagraphHasBullet)
 			return;
@@ -1018,7 +1020,7 @@
     return self.selectedRange.length > 0;
 }
 
-// By default, if this function is called with nothing selection, it will resize all text.
+// By default, if this function is called with nothing selected, it will resize all text.
 -(void)changeFontSizeWithOperation:(CGFloat(^)(CGFloat currFontSize))operation {
     [self.textStorage beginEditing];
     NSRange range = self.selectedRange;
