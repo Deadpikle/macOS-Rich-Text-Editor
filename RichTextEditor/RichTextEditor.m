@@ -247,8 +247,7 @@
     if (!self.isInTextDidChange)
     {
         self.isInTextDidChange = YES;
-        if (!self.justDeletedBackward) // fix for issue where deleting a char that isn't in a bulleted list right before a bulleted list added a bullet
-            [self applyBulletListIfApplicable];
+		[self applyBulletListIfApplicable];
         [self deleteBulletListWhenApplicable];
         self.isInTextDidChange = NO;
     }
@@ -1164,7 +1163,7 @@
     }
 	if (rangeOfCurrentParagraph.length != 0)
 		return;
-    if ([[self.attributedString.string substringFromIndex:rangeOfPreviousParagraph.location] hasPrefix:self.BULLET_STRING])
+    if (!self.justDeletedBackward && [[self.attributedString.string substringFromIndex:rangeOfPreviousParagraph.location] hasPrefix:self.BULLET_STRING])
         [self userSelectedBullet];
 }
 
