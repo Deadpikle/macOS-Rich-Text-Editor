@@ -1297,6 +1297,7 @@
         bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
         bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
         keyChar = [key characterAtIndex:0];
+		_lastSingleKeyPressed = keyChar;
         if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
             keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
             [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
