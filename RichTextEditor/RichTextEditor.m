@@ -1300,9 +1300,10 @@
 		_lastSingleKeyPressed = keyChar;
         if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
             keyChar == NSUpArrowFunctionKey || keyChar == NSDownArrowFunctionKey) {
-            [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
+			[self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
+			[super keyDown:event];
         }
-        if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown && !shiftKeyDown) {
+        else if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown && !shiftKeyDown) {
             [self userSelectedBold];
         }
         else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown && !shiftKeyDown) {
