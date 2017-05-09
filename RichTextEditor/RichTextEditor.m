@@ -1233,6 +1233,7 @@
 }
 
 - (void)mouseDown:(NSEvent *)theEvent {
+	_lastSingleKeyPressed = 0;
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeMouseDown];
     [super mouseDown:theEvent];
 }
