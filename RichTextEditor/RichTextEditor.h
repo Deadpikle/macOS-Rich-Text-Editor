@@ -65,7 +65,8 @@ typedef NS_ENUM(NSInteger, RichTextEditorPreviewChange) {
     RichTextEditorPreviewChangeMouseDown,
     RichTextEditorPreviewChangeArrowKey,
     RichTextEditorPreviewChangeKeyDown,
-	RichTextEditorPreviewChangeDelete
+	RichTextEditorPreviewChangeDelete,
+    RichTextEditorPreviewChangeFindReplace
 };
 
 @protocol RichTextEditorDelegate <NSObject>

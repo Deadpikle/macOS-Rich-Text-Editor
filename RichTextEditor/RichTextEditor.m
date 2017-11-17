@@ -1282,6 +1282,8 @@
 		case RichTextEditorPreviewChangeMouseDown:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Mouse Down", @"");
+        case RichTextEditorPreviewChangeFindReplace:
+            return NSLocalizedString(@"Find & Replace", @"");
 		default:
 			break;
 	}
