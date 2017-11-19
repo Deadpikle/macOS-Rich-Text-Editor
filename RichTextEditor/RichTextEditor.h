@@ -143,6 +143,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
 
+- (NSString*)bulletString;
+
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
 

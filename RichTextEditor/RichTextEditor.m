@@ -1238,6 +1238,10 @@
     [super mouseDown:theEvent];
 }
 
+- (NSString*)bulletString {
+    return self.BULLET_STRING;
+}
+
 + (NSString *)convertPreviewChangeTypeToString:(RichTextEditorPreviewChange)changeType withNonSpecialChangeText:(BOOL)shouldReturnStringForNonSpecialType {
 	switch (changeType) {
 		case RichTextEditorPreviewChangeBold:
