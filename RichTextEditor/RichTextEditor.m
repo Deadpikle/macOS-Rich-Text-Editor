@@ -1271,21 +1271,27 @@
 		case RichTextEditorPreviewChangeKeyDown:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Key Down", @"");
+            break;
 		case RichTextEditorPreviewChangeEnter:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Enter [Return] Key", @"");
+            break;
 		case RichTextEditorPreviewChangeSpace:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Space", @"");
+            break;
 		case RichTextEditorPreviewChangeDelete:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Delete", @"");
+            break;
 		case RichTextEditorPreviewChangeArrowKey:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Arrow Key Movement", @"");
+            break;
 		case RichTextEditorPreviewChangeMouseDown:
 			if (shouldReturnStringForNonSpecialType)
 				return NSLocalizedString(@"Mouse Down", @"");
+            break;
         case RichTextEditorPreviewChangeFindReplace:
             return NSLocalizedString(@"Find & Replace", @"");
 		default:
