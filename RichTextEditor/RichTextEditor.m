@@ -70,6 +70,9 @@
 @property BOOL inBulletedList;
 @property BOOL justDeletedBackward;
 
+@property (nonatomic) NSRange lastAnchorPoint;
+@property BOOL shouldEndColorChangeOnLeft;
+
 @property WZProtocolInterceptor *delegate_interceptor;
 
 @end
@@ -126,6 +129,8 @@
 	
     self.borderColor = [NSColor lightGrayColor];
     self.borderWidth = 1.0;
+    
+    self.shouldEndColorChangeOnLeft = NO;
     
 	self.typingAttributesInProgress = NO;
     self.isInTextDidChange = NO;
@@ -206,6 +211,69 @@
 -(void)deleteBackward:(id)sender {
     self.justDeletedBackward = YES;
     [super deleteBackward:sender];
+}
+
+// https://stackoverflow.com/a/23667851/3938401
+- (void)setSelectedRange:(NSRange)charRange affinity:(NSSelectionAffinity)affinity stillSelecting:(BOOL)stillSelectingFlag {
+    if (charRange.length == 0) {
+        self.lastAnchorPoint = charRange;
+    }
+    [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
+}
+
+// https://stackoverflow.com/a/23667851/3938401
+- (NSRange)textView:(NSTextView *)textView willChangeSelectionFromCharacterRange:(NSRange)oldSelectedCharRange toCharacterRange:(NSRange)newSelectedCharRange {
+    
+    if (newSelectedCharRange.length != 0) {
+        int anchorStart = (int)self.lastAnchorPoint.location;
+        int selectionStart = (int)newSelectedCharRange.location;
+        int selectionLength = (int)newSelectedCharRange.length;
+        
+        /*
+         If mouse selects left, and then a user arrows right, or the opposite, anchor point flips.
+         */
+        int difference = anchorStart - selectionStart;
+        if (difference > 0 && difference != selectionLength) {
+            if (oldSelectedCharRange.location == newSelectedCharRange.location) {
+                // We were selecting left via mouse, but now we are selecting to the right via arrows
+                anchorStart = selectionStart;
+            }
+            else {
+                // We were selecting right via mouse, but now we are selecting to the left via arrows
+                anchorStart = selectionStart + selectionLength;
+            }
+            self.lastAnchorPoint = NSMakeRange(anchorStart, 0);
+        }
+        
+        // Evaluate Selection Direction
+        if (anchorStart == selectionStart) {
+            if (oldSelectedCharRange.length < newSelectedCharRange.length) {
+                // Bigger
+                NSLog(@"Will select right in overall right selection");
+            }
+            else {
+                // Smaller
+                NSLog(@"Will select left in overall right selection");
+            }
+            self.shouldEndColorChangeOnLeft = NO;
+        }
+        else {
+            self.shouldEndColorChangeOnLeft = YES;
+            if (oldSelectedCharRange.length < newSelectedCharRange.length) {
+                // Bigger
+                NSLog(@"Will select left in overall left selection");
+            }
+            else {
+                // Smaller
+                NSLog(@"Will select right in overall left selection");
+            }
+        }
+    }
+    
+    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
+        return [self.delegate textView:textView willChangeSelectionFromCharacterRange:oldSelectedCharRange toCharacterRange:newSelectedCharRange];
+    }
+    return newSelectedCharRange;
 }
 
 - (void)textViewDidChangeSelection:(NSNotification *)notification {
@@ -293,7 +361,6 @@
 
 #pragma mark -
 
-
 - (void)sendDelegateTypingAttrsUpdate {
     if (self.rteDelegate) {
         NSDictionary *attributes = [self typingAttributes];
@@ -371,7 +438,12 @@
 	else {
         [self removeAttributeForKeyFromSelectedRange:NSBackgroundColorAttributeName];
 	}
-    [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    if (self.shouldEndColorChangeOnLeft) {
+        [self setSelectedRange:NSMakeRange(selectedRange.location, 0)];
+    }
+    else {
+        [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    }
     [self sendDelegateTVChanged];
 }
 
@@ -384,7 +456,12 @@
     else {
         [self removeAttributeForKeyFromSelectedRange:NSForegroundColorAttributeName];
     }
-    [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    if (self.shouldEndColorChangeOnLeft) {
+        [self setSelectedRange:NSMakeRange(selectedRange.location, 0)];
+    }
+    else {
+        [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
+    }
     [self sendDelegateTVChanged];
 }
 
