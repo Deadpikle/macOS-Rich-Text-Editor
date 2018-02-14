@@ -16,12 +16,12 @@ Based upon the Rich Text Editor at [here](https://github.com/Deadpikle/iOS-Rich-
 ### TODO
 
 - [ ] Convert to tabs instead of spaces
-- [ ] Starting bracket for function/conditional on same line as function name or conditional instead of next line
+- [x] Starting bracket for function/conditional on same line as function name or conditional instead of next line
 - [ ] Create an example
-- [ ] Show how to call/use from Swift 3
+- [ ] Show how to call/use from Swift 4
 - [ ] Get this on Cocoapods
 
-####Scaling Text [TODO: move to Wiki]
+#### Scaling Text [TODO: move to Wiki]
 
 If you want to scale text, you can use code similar to the following (based on http://stackoverflow.com/a/14113905/3938401):
 ```
