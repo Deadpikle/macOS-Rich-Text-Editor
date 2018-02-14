@@ -32,40 +32,38 @@
 
 @implementation NSFont (RichTextEditor)
 
-+ (NSString *)postscriptNameFromFullName:(NSString *)fullName
-{
++ (NSString *)postscriptNameFromFullName:(NSString *)fullName {
 	NSFont *font = [NSFont fontWithName:fullName size:1];
 	return (__bridge NSString *)(CTFontCopyPostScriptName((__bridge CTFontRef)(font)));
 }
 
-+ (NSFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic
-{
++ (NSFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic {
 	NSString *postScriptName = [NSFont postscriptNameFromFullName:name];
 	
 	CTFontSymbolicTraits traits = 0;
 	CTFontRef newFontRef;
 	CTFontRef fontWithoutTrait = CTFontCreateWithName((__bridge CFStringRef)(postScriptName), size, NULL);
 	
-	if (isItalic)
-		traits |= kCTFontItalicTrait;
+    if (isItalic) {
+        traits |= kCTFontItalicTrait;
+    }
 	
-	if (isBold)
+    if (isBold) {
 		traits |= kCTFontBoldTrait;
+    }
 	
-	if (traits == 0)
-	{
+	if (traits == 0) {
 		newFontRef= CTFontCreateCopyWithAttributes(fontWithoutTrait, 0.0, NULL, NULL);
 	}
-	else
-	{
+	else {
 		newFontRef = CTFontCreateCopyWithSymbolicTraits(fontWithoutTrait, 0.0, NULL, traits, traits);
 	}
 	
-	if (fontWithoutTrait)
+    if (fontWithoutTrait) {
 		CFRelease(fontWithoutTrait);
+    }
 	
-	if (newFontRef)
-	{
+	if (newFontRef) {
 		NSString *fontNameKey = (__bridge NSString *)(CTFontCopyName(newFontRef, kCTFontPostScriptNameKey));
         CGFloat size = CTFontGetSize(newFontRef);
 		CFRelease(newFontRef);
@@ -75,35 +73,31 @@
 	return nil;
 }
 
-- (NSFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size
-{
+- (NSFont *)fontWithBoldTrait:(BOOL)bold italicTrait:(BOOL)italic andSize:(CGFloat)size {
 	CTFontRef fontRef = (__bridge CTFontRef)self;
 	NSString *familyName = (__bridge NSString *)(CTFontCopyName(fontRef, kCTFontFamilyNameKey));
 	NSString *postScriptName = [NSFont postscriptNameFromFullName:familyName];
 	return [[self class] fontWithName:postScriptName size:size boldTrait:bold italicTrait:italic];
 }
 
-- (NSFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic
-{
+- (NSFont *)fontWithBoldTrait:(BOOL)bold andItalicTrait:(BOOL)italic {
 	return [self fontWithBoldTrait:bold italicTrait:italic andSize:self.pointSize];
 }
 
-- (BOOL)isBold
-{
+- (BOOL)isBold {
 	CTFontSymbolicTraits trait = CTFontGetSymbolicTraits((__bridge CTFontRef)self);
-	
-	if ((trait & kCTFontTraitBold) == kCTFontTraitBold)
+    if ((trait & kCTFontTraitBold) == kCTFontTraitBold) {
 		return YES;
+    }
 	
 	return NO;
 }
 
-- (BOOL)isItalic
-{
+- (BOOL)isItalic {
 	CTFontSymbolicTraits trait = CTFontGetSymbolicTraits((__bridge CTFontRef)self);
-	
-	if ((trait & kCTFontTraitItalic) == kCTFontTraitItalic)
+    if ((trait & kCTFontTraitItalic) == kCTFontTraitItalic) {
 		return YES;
+    }
 	
 	return NO;
 }

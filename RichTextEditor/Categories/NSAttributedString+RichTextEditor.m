@@ -33,10 +33,10 @@
 
 #pragma mark - Public Methods -
 
-- (NSRange)firstParagraphRangeFromTextRange:(NSRange)range
-{
-	if (self.string.length == 0 || self.string.length < range.location)
+- (NSRange)firstParagraphRangeFromTextRange:(NSRange)range {
+    if (self.string.length == 0 || self.string.length < range.location) {
 		return NSMakeRange(0, 0);
+    }
 	
 	NSInteger start = -1;
 	NSInteger end = -1;
@@ -46,11 +46,9 @@
 		range.location-1 :
 		range.location;
 	
-	for (NSInteger i=startingRange ; i>=0 ; i--)
-	{
+	for (NSInteger i = startingRange; i >= 0; i--) {
 		char c = [self.string characterAtIndex:i];
-		if (c == '\n')
-		{
+		if (c == '\n') {
 			start = i+1;
 			break;
 		}
@@ -60,8 +58,7 @@
 	
 	NSInteger moveForwardIndex = (range.location > start) ? range.location : start;
 	
-	for (NSInteger i=moveForwardIndex; i<= self.string.length-1 ; i++)
-	{
+	for (NSInteger i = moveForwardIndex; i <= self.string.length - 1; i++) {
 		char c = [self.string characterAtIndex:i];
 		if (c == '\n')
 		{
@@ -76,32 +73,29 @@
 	return NSMakeRange(start, length);
 }
 
-- (NSArray *)rangeOfParagraphsFromTextRange:(NSRange)textRange
-{
+- (NSArray *)rangeOfParagraphsFromTextRange:(NSRange)textRange {
 	NSMutableArray *paragraphRanges = [NSMutableArray array];
 	NSInteger rangeStartIndex = textRange.location;
 	
-	while (true)
-	{
+	while (true) {
 		NSRange range = [self firstParagraphRangeFromTextRange:NSMakeRange(rangeStartIndex, 0)];
 		rangeStartIndex = range.location + range.length + 1;
 		
 		[paragraphRanges addObject:[NSValue valueWithRange:range]];
 		
-		if (range.location + range.length >= textRange.location + textRange.length)
+        if (range.location + range.length >= textRange.location + textRange.length) {
 			break;
+        }
 	}
 	
 	return paragraphRanges;
 }
 
-- (NSString *)htmlString
-{
+- (NSString *)htmlString {
 	NSMutableString *htmlString = [NSMutableString string];
 	NSArray *paragraphRanges = [self rangeOfParagraphsFromTextRange:NSMakeRange(0, self.string.length-1)];
 	
-	for (int i=0 ; i<paragraphRanges.count ; i++)
-	{
+	for (int i = 0; i < paragraphRanges.count; i++) {
 		NSValue *value = [paragraphRanges objectAtIndex:i];
 		NSRange range = [value rangeValue];
 		NSDictionary *paragraphDictionary = [self attributesAtIndex:range.location effectiveRange:nil];
@@ -110,16 +104,19 @@
 		
 		[htmlString appendString:@"<p "];
 		
-		if (textAlignmentString)
+        if (textAlignmentString) {
 			[htmlString appendFormat:@"align=\"%@\" ", textAlignmentString];
+        }
 		
 		[htmlString appendFormat:@"style=\""];
 		
-		if (paragraphStyle.firstLineHeadIndent > 0)
+        if (paragraphStyle.firstLineHeadIndent > 0) {
 			[htmlString appendFormat:@"text-indent:%.0fpx; ", paragraphStyle.firstLineHeadIndent - paragraphStyle.headIndent];
+        }
 		
-		if (paragraphStyle.headIndent > 0)
+        if (paragraphStyle.headIndent > 0) {
 			[htmlString appendFormat:@"margin-left:%.0fpx; ", paragraphStyle.headIndent];
+        }
 			
 		
 		[htmlString appendString:@" \">"];
@@ -145,11 +142,13 @@
 								  
 								  [fontString appendFormat:@"font-size:%.0fpx; ", font.pointSize];
 								  
-								  if (foregroundColor && [foregroundColor isKindOfClass:[NSColor class]])
+                                  if (foregroundColor && [foregroundColor isKindOfClass:[NSColor class]]) {
 									  [fontString appendFormat:@"color:%@; ", [self htmlRgbColor:foregroundColor]];
+                                  }
 								  
-								  if (backGroundColor && [backGroundColor isKindOfClass:[NSColor class]])
+                                  if (backGroundColor && [backGroundColor isKindOfClass:[NSColor class]]) {
 									  [fontString appendFormat:@"background-color:%@; ", [self htmlRgbColor:backGroundColor]];
+                                  }
 								  
 								  [fontString appendString:@"\" "];
 								  // End Style
@@ -157,35 +156,28 @@
 								  [fontString appendString:@">"];
 								  [fontString appendString:[[self.string substringFromIndex:range.location] substringToIndex:range.length]];
 								  [fontString appendString:@"</font>"];
-								  
-								  if ([font isBold])
-								  {
+                                  if ([font isBold]) {
 									  [fontString insertString:@"<b>" atIndex:0];
 									  [fontString insertString:@"</b>" atIndex:fontString.length];
 								  }
 								  
-								  if ([font isItalic])
-								  {
+								  if ([font isItalic]) {
 									  [fontString insertString:@"<i>" atIndex:0];
 									  [fontString insertString:@"</i>" atIndex:fontString.length];
 								  }
 								  
-								  if (hasUnderline)
-								  {
+								  if (hasUnderline) {
 									  [fontString insertString:@"<u>" atIndex:0];
 									  [fontString insertString:@"</u>" atIndex:fontString.length];
 								  }
 								  
-								  if (hasStrikeThrough)
-								  {
+								  if (hasStrikeThrough) {
 									  [fontString insertString:@"<strike>" atIndex:0];
 									  [fontString insertString:@"</strike>" atIndex:fontString.length];
 								  }
 								  
-								  
 								  [htmlString appendString:fontString];
 							  }];
-		
 		[htmlString appendString:@"</p>"];
 	}
 	
@@ -194,29 +186,22 @@
 
 #pragma mark - Helper Methods -
 
-- (NSString *)htmlTextAlignmentString:(NSTextAlignment)textAlignment
-{
-	switch (textAlignment)
-	{
+- (NSString *)htmlTextAlignmentString:(NSTextAlignment)textAlignment {
+	switch (textAlignment) {
 		case NSLeftTextAlignment:
 			return @"left";
-	
 		case NSCenterTextAlignment:
 			return @"center";
-			
 		case NSRightTextAlignment:
 			return @"right";
-			
 		case NSJustifiedTextAlignment:
 			return @"justify";
-			
 		default:
 			return nil;
 	}
 }
 
-- (NSString *)htmlRgbColor:(NSColor *)color
-{
+- (NSString *)htmlRgbColor:(NSColor *)color {
 	CGFloat red = 0.0, green = 0.0, blue = 0.0, alpha = 0.0;
 	[color getRed:&red green:&green blue:&blue alpha:&alpha];
 	return [NSString stringWithFormat:@"rgb(%d,%d,%d)",(int)(red*255.0), (int)(green*255.0), (int)(blue*255.0)];
