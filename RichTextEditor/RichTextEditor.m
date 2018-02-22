@@ -249,11 +249,11 @@
         if (anchorStart == selectionStart) {
             if (oldSelectedCharRange.length < newSelectedCharRange.length) {
                 // Bigger
-                NSLog(@"Will select right in overall right selection");
+                //NSLog(@"Will select right in overall right selection");
             }
             else {
                 // Smaller
-                NSLog(@"Will select left in overall right selection");
+                //NSLog(@"Will select left in overall right selection");
             }
             self.shouldEndColorChangeOnLeft = NO;
         }
@@ -261,11 +261,11 @@
             self.shouldEndColorChangeOnLeft = YES;
             if (oldSelectedCharRange.length < newSelectedCharRange.length) {
                 // Bigger
-                NSLog(@"Will select left in overall left selection");
+                //NSLog(@"Will select left in overall left selection");
             }
             else {
                 // Smaller
-                NSLog(@"Will select right in overall left selection");
+                //NSLog(@"Will select right in overall left selection");
             }
         }
     }
