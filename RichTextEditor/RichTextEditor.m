@@ -449,18 +449,11 @@
 
 -(void)userSelectedTextColor:(NSColor*)color {
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeFontColor];
-    NSRange selectedRange = [self selectedRange];
     if (color) {
         [self applyAttributesToSelectedRange:color forKey:NSForegroundColorAttributeName];
     }
     else {
         [self removeAttributeForKeyFromSelectedRange:NSForegroundColorAttributeName];
-    }
-    if (self.shouldEndColorChangeOnLeft) {
-        [self setSelectedRange:NSMakeRange(selectedRange.location, 0)];
-    }
-    else {
-        [self setSelectedRange:NSMakeRange(selectedRange.location + selectedRange.length, 0)];
     }
     [self sendDelegateTVChanged];
 }
