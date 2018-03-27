@@ -45,28 +45,29 @@
 - (NSUInteger)levelsOfUndo;
 @end
 
-
+// These values will always start from 0 and go up. If you want to add your own
+// preview changes via a subclass, start from 9999 and go down (or similar) and
+// override convertPreviewChangeTypeToString:withNonSpecialChangeText:
 typedef NS_ENUM(NSInteger, RichTextEditorPreviewChange) {
-    RichTextEditorPreviewChangeBold,
-    RichTextEditorPreviewChangeItalic,
-    RichTextEditorPreviewChangeUnderline,
-    RichTextEditorPreviewChangeFontResize,
-    RichTextEditorPreviewChangeHighlight,
-    RichTextEditorPreviewChangeFontSize,
-    RichTextEditorPreviewChangeFontColor,
-    RichTextEditorPreviewChangeIndentIncrease,
-    RichTextEditorPreviewChangeIndentDecrease,
-    RichTextEditorPreviewChangeCut,
-    RichTextEditorPreviewChangePaste,
-    RichTextEditorPreviewChangePageBreak,
-    RichTextEditorPreviewChangeSpace,
-    RichTextEditorPreviewChangeEnter,
-    RichTextEditorPreviewChangeBullet,
-    RichTextEditorPreviewChangeMouseDown,
-    RichTextEditorPreviewChangeArrowKey,
-    RichTextEditorPreviewChangeKeyDown,
-	RichTextEditorPreviewChangeDelete,
-    RichTextEditorPreviewChangeFindReplace
+    RichTextEditorPreviewChangeBold             = 0,
+    RichTextEditorPreviewChangeItalic           = 1,
+    RichTextEditorPreviewChangeUnderline        = 2,
+    RichTextEditorPreviewChangeFontResize       = 3,
+    RichTextEditorPreviewChangeHighlight        = 4,
+    RichTextEditorPreviewChangeFontSize         = 5,
+    RichTextEditorPreviewChangeFontColor        = 6,
+    RichTextEditorPreviewChangeIndentIncrease   = 7,
+    RichTextEditorPreviewChangeIndentDecrease   = 8,
+    RichTextEditorPreviewChangeCut              = 9,
+    RichTextEditorPreviewChangePaste            = 10,
+    RichTextEditorPreviewChangeSpace            = 11,
+    RichTextEditorPreviewChangeEnter            = 12,
+    RichTextEditorPreviewChangeBullet           = 13,
+    RichTextEditorPreviewChangeMouseDown        = 14,
+    RichTextEditorPreviewChangeArrowKey         = 15,
+    RichTextEditorPreviewChangeKeyDown          = 16,
+	RichTextEditorPreviewChangeDelete           = 17,
+    RichTextEditorPreviewChangeFindReplace      = 18
 };
 
 @protocol RichTextEditorDelegate <NSObject>
@@ -138,8 +139,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 - (void)setBorderColor:(NSColor*)borderColor;
 - (void)setBorderWidth:(CGFloat)borderWidth;
 
-- (void)userSelectedPageBreak:(NSString*)pageBreakString;
-
 - (NSString *)htmlString;
 - (void)setHtmlString:(NSString *)htmlString;
 
@@ -149,5 +148,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
 
 + (NSString *)convertPreviewChangeTypeToString:(RichTextEditorPreviewChange)changeType withNonSpecialChangeText:(BOOL)shouldReturnStringForNonSpecialType;
+
+// I'm not sure why you'd call these externally, but subclasses can make use of this for custom toolbar items or what have you.
+// It's just easier to put these in the public header than to have a protected/subclasses-only header.
+-(void)sendDelegatePreviewChangeOfType:(RichTextEditorPreviewChange)type;
+-(void)sendDelegateTVChanged;
 
 @end

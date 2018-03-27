@@ -458,59 +458,6 @@
     [self sendDelegateTVChanged];
 }
 
-- (void)userSelectedPageBreak:(NSString*)pageBreakString {
-    [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangePageBreak];
-    NSMutableDictionary *pageBreakAttributes = [self.typingAttributes mutableCopy];
-    NSMutableDictionary *currentTypingAttributes = [self.typingAttributes mutableCopy];
-    NSMutableParagraphStyle *paragraphStyle = [[pageBreakAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
-    paragraphStyle.headIndent = 0;
-    paragraphStyle.firstLineHeadIndent = 0;
-    //paragraphStyle.lineSpacing = 0;
-    paragraphStyle.paragraphSpacingBefore = 0;
-    //paragraphStyle.lineHeightMultiple = 0;
-    //paragraphStyle.maximumLineHeight = 16;
-    //paragraphStyle.paragraphSpacing = 16;
-    [pageBreakAttributes setObject:paragraphStyle forKey:NSParagraphStyleAttributeName];
-    NSFont *currFont = [pageBreakAttributes objectForKey:NSFontAttributeName];
-    NSFont *nextFont = [currFont fontWithBoldTrait:NO italicTrait:NO andSize:currFont.pointSize];
-    
-    [pageBreakAttributes setObject:nextFont forKey:NSFontAttributeName];
-    [pageBreakAttributes setValue:[NSNumber numberWithInteger:NSUnderlineStyleNone] forKey:NSUnderlineStyleAttributeName];
-    // Setup newline string
-    //NSMutableParagraphStyle *newlineParagraphStyle = [[currentTypingAttributes objectForKey:NSParagraphStyleAttributeName] mutableCopy];
-    //newlineParagraphStyle.paragraphSpacingBefore = 16;
-   // [currentTypingAttributes setObject:newlineParagraphStyle forKey:NSParagraphStyleAttributeName];
-    NSAttributedString *newlineString = [[NSAttributedString alloc] initWithString:@"\n" attributes:currentTypingAttributes];
-    NSAttributedString *pageBreakAttrString = [[NSAttributedString alloc] initWithString:pageBreakString attributes:pageBreakAttributes];
-    
-    NSRange rangeOfCurrentParagraph = [self.textStorage firstParagraphRangeFromTextRange:self.selectedRange];
-    NSString *currentParagraph = [self.textStorage.string substringWithRange:rangeOfCurrentParagraph];
-    
-    NSMutableAttributedString *mutableAttributedString = [[NSMutableAttributedString alloc] init];
-    // if current paragraph is blank, don't insert a newline before the page break text
-    if (![[currentParagraph stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] isEqualToString:@""]) {
-        [mutableAttributedString appendAttributedString:newlineString];
-    }
-    [mutableAttributedString appendAttributedString:pageBreakAttrString];
-    
-    // see if we need to insert another newline
-    // we do if the user inserted the page break in the middle of text, basically
-    // so if the rest of the paragraph trimmed is not empty, then insert a newline
-    // or if the selectedRange is at the end of the text, insert a newline
-    NSString *currParagraphAfterSelectedRange = [currentParagraph substringFromIndex:self.selectedRange.location - rangeOfCurrentParagraph.location];
-    currParagraphAfterSelectedRange = [currParagraphAfterSelectedRange stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-    if (![currParagraphAfterSelectedRange isEqualToString:@""] || self.selectedRange.location == self.textStorage.string.length) {
-        [mutableAttributedString appendAttributedString:newlineString];
-    }
-    
-    [self.textStorage insertAttributedString:mutableAttributedString atIndex:self.selectedRange.location];
-    
-    
-    [self setTypingAttributes:currentTypingAttributes];
-    
-    [self sendDelegateTVChanged];
-}
-
 - (BOOL)canBecomeFirstResponder {
 	return YES;
 }
@@ -1225,8 +1172,6 @@
 			return NSLocalizedString(@"Font Color", @"");
 		case RichTextEditorPreviewChangeHighlight:
 			return NSLocalizedString(@"Text Highlight", @"");
-		case RichTextEditorPreviewChangePageBreak:
-			return NSLocalizedString(@"Insert Page Break", @"");
 		case RichTextEditorPreviewChangeUnderline:
 			return NSLocalizedString(@"Underline", @"");
 		case RichTextEditorPreviewChangeIndentDecrease:
