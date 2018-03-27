@@ -1,6 +1,5 @@
 macOS Rich Text Editor
 ==================
-**NOTE: This repo is in real need of some help. Code needs cleaned up, it doesn't support numbered lists, and the implementation for bulleted lists could be reworked (although the current implementation appears to be working OK overall). I haven't gotten the chance to do this myself. Please help!**
 
 You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. for you. Some day, in a perfect world, I'll update this with a proper example. Rest assured, however, that I (Deadpikle) am using this code in a presentation software package for speaker notes rich text editing, and it works rather well.
 
@@ -11,15 +10,29 @@ You will need to implement much of the UI yourself (buttons, handling selection 
 	- NSAttributedString+RichTextEditor.h/m
 	- WZProtocolInterceptor.h/m
 
-Based upon the Rich Text Editor at [here](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the original code [here](https://github.com/aryaxt/iOS-Rich-Text-Editor).
+Based upon the Rich Text Editor [here](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the original code [here](https://github.com/aryaxt/iOS-Rich-Text-Editor).
 
 ### TODO
 
 - [ ] Convert to tabs instead of spaces
 - [x] Starting bracket for function/conditional on same line as function name or conditional instead of next line
-- [ ] Create an example
+- [ ] Create an example with a working GUI
 - [ ] Show how to call/use from Swift 4
 - [ ] Get this on Cocoapods
+
+### Features:
+
+- Bold
+- Italic
+- Underline
+- Strikethrough
+- Font
+- Font size
+- Text background color
+- Text foregroud color
+- Text alignment
+- Paragraph Indent/Outdent
+- Bulleted lists
 
 #### Scaling Text [TODO: move to Wiki]
 
@@ -65,20 +78,8 @@ If you want to scale text, you can use code similar to the following (based on h
 @end
 ```
 
-### Features:
-
-- Bold
-- Italic
-- Underline
-- StrikeThrough
-- Font
-- Font size
-- Text background color
-- Text foregroud color
-- Text alignment
-- Paragraph Indent/Outdent
-
 
 Credits
 -------------------------
-Original Rich Text Editor code by aryaxt at [iOS Rich Text Editor](https://github.com/aryaxt/iOS-Rich-Text-Editor).
+
+Original Rich Text Editor code by aryaxt at [iOS Rich Text Editor](https://github.com/aryaxt/iOS-Rich-Text-Editor). `WZProtocolInterceptor` is from [here](http://stackoverflow.com/a/18777565/3938401).
