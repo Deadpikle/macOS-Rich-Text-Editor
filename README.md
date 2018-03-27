@@ -14,11 +14,12 @@ Based upon the Rich Text Editor [here](https://github.com/Deadpikle/iOS-Rich-Tex
 
 ### TODO
 
-- [ ] Convert to tabs instead of spaces
+- [ ] Tab/spaces consistency
 - [x] Starting bracket for function/conditional on same line as function name or conditional instead of next line
 - [ ] Create an example with a working GUI
 - [ ] Show how to call/use from Swift 4
 - [ ] Get this on Cocoapods
+- [ ] Framework output (Carthage too?)
 
 ### Features:
 
