@@ -36,13 +36,13 @@
 #import <Cocoa/Cocoa.h>
 
 @class RichTextEditor;
+
 @protocol RichTextEditorDataSource <NSObject>
+
 @optional
-- (NSArray *)fontSizeSelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (NSArray *)fontFamilySelectionForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (BOOL)shouldDisplayToolbarForRichTextEditor:(RichTextEditor *)richTextEditor;
-- (BOOL)shouldDisplayRichTextOptionsInMenuControllerForRichTextEditor:(RichTextEditor *)richTextEditor;
+
 - (NSUInteger)levelsOfUndo;
+
 @end
 
 // These values will always start from 0 and go up. If you want to add your own
