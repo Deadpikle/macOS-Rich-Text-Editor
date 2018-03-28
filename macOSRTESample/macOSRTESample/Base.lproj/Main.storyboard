@@ -1,7 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="11134" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11134"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
         <!--Application-->
@@ -673,7 +674,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModuleProvider=""/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -683,12 +684,12 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="macOS Rich Text Editor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
-			<connections>
+                        <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
                     </window>
@@ -703,15 +704,190 @@
         <!--View Controller-->
         <scene sceneID="hIz-AP-VOD">
             <objects>
-                <viewController id="XfG-lQ-9wD" customClass="ViewController" customModuleProvider="" sceneMemberID="viewController">
+                <viewController id="XfG-lQ-9wD" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" wantsLayer="YES" id="m2S-Jp-Qdl">
-                        <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
+                        <rect key="frame" x="0.0" y="0.0" width="640" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <subviews>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="G2e-lU-zjA">
+                                <rect key="frame" x="202" y="447" width="237" height="19"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="macOS Rich Text Editor Sample" id="Bcv-lA-TrF">
+                                    <font key="font" metaFont="system" size="16"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
+                            <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PhS-1d-JEf">
+                                <rect key="frame" x="0.0" y="0.0" width="640" height="412"/>
+                                <clipView key="contentView" id="bEQ-mC-V9I">
+                                    <rect key="frame" x="1" y="1" width="623" height="410"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="756-Yc-7La" customClass="RichTextEditor">
+                                            <rect key="frame" x="0.0" y="0.0" width="623" height="410"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                            <size key="minSize" width="623" height="410"/>
+                                            <size key="maxSize" width="480623" height="10000000"/>
+                                            <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                        </textView>
+                                    </subviews>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="5CO-ui-Kgg">
+                                    <rect key="frame" x="-100" y="-100" width="87" height="18"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="R5B-sR-jY7">
+                                    <rect key="frame" x="624" y="1" width="15" height="410"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="5Cg-eh-gtb">
+                                <rect key="frame" x="2" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="b2B-wW-bEO"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="bold" imagePosition="only" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="pTO-yT-BBl">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleBold:" target="XfG-lQ-9wD" id="9xj-ES-c0l"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kNB-8o-LKu">
+                                <rect key="frame" x="42" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="ovJ-mc-VnM"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="italic" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="tWD-HC-b17">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleItalic:" target="XfG-lQ-9wD" id="9kS-1n-KN0"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wyN-Sw-Yo0">
+                                <rect key="frame" x="82" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="6Sa-cF-GSQ"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="underline" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="i1O-mb-2L9">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleUnderline:" target="XfG-lQ-9wD" id="K91-t4-PvL"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rvS-Wc-qH0">
+                                <rect key="frame" x="131" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="XXD-Go-sCY"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="bulleted-list" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="UVB-NR-tqy">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="toggleBulletedList:" target="XfG-lQ-9wD" id="CRU-RF-qn7"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hpW-8d-S0N">
+                                <rect key="frame" x="188" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="p1p-NP-Y4W"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="indent-decrease" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="iwC-4k-f7l">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="decreaseIndent:" target="XfG-lQ-9wD" id="pw6-6F-hjr"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xXM-qv-AHk">
+                                <rect key="frame" x="228" y="411" width="40" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="28" id="7od-vo-cLe"/>
+                                </constraints>
+                                <buttonCell key="cell" type="push" bezelStyle="rounded" image="indent-increase" imagePosition="overlaps" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="lrc-nq-MgG">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="increaseIndent:" target="XfG-lQ-9wD" id="tvO-Xe-g3Y"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x5L-0P-Oih">
+                                <rect key="frame" x="279" y="411" width="157" height="32"/>
+                                <buttonCell key="cell" type="push" title="Decrease Font Size" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="W0s-3F-tig">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="decreaseFontSize:" target="XfG-lQ-9wD" id="Tre-qc-ygN"/>
+                                </connections>
+                            </button>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7cL-pi-vJL">
+                                <rect key="frame" x="430" y="411" width="152" height="32"/>
+                                <buttonCell key="cell" type="push" title="Increase Font Size" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FXw-2J-zOR">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="increaseFontSize:" target="XfG-lQ-9wD" id="hej-R4-0Ep"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="xXM-qv-AHk" firstAttribute="leading" secondItem="hpW-8d-S0N" secondAttribute="trailing" constant="12" id="2Jo-mJ-v60"/>
+                            <constraint firstItem="wyN-Sw-Yo0" firstAttribute="centerY" secondItem="kNB-8o-LKu" secondAttribute="centerY" id="JS1-4M-Th1"/>
+                            <constraint firstItem="5Cg-eh-gtb" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="41" id="O7E-y6-AqK"/>
+                            <constraint firstAttribute="bottom" secondItem="PhS-1d-JEf" secondAttribute="bottom" id="OON-Gh-jzk"/>
+                            <constraint firstItem="PhS-1d-JEf" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="68" id="P5e-bk-1PU"/>
+                            <constraint firstItem="xXM-qv-AHk" firstAttribute="centerY" secondItem="hpW-8d-S0N" secondAttribute="centerY" id="PRi-UG-M6j"/>
+                            <constraint firstAttribute="trailing" secondItem="PhS-1d-JEf" secondAttribute="trailing" id="Pbn-cf-xEf"/>
+                            <constraint firstItem="hpW-8d-S0N" firstAttribute="centerY" secondItem="rvS-Wc-qH0" secondAttribute="centerY" id="R8u-J1-Baf"/>
+                            <constraint firstItem="kNB-8o-LKu" firstAttribute="leading" secondItem="5Cg-eh-gtb" secondAttribute="trailing" constant="12" id="RT3-hL-ieM"/>
+                            <constraint firstItem="5Cg-eh-gtb" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="Tn4-Wz-eia"/>
+                            <constraint firstItem="PhS-1d-JEf" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="ZGp-U8-t8e"/>
+                            <constraint firstItem="G2e-lU-zjA" firstAttribute="centerX" secondItem="m2S-Jp-Qdl" secondAttribute="centerX" id="dnY-1l-jFS"/>
+                            <constraint firstItem="rvS-Wc-qH0" firstAttribute="leading" secondItem="wyN-Sw-Yo0" secondAttribute="trailing" constant="21" id="hjD-Yl-oEv"/>
+                            <constraint firstItem="x5L-0P-Oih" firstAttribute="centerY" secondItem="xXM-qv-AHk" secondAttribute="centerY" id="iRv-YV-yfr"/>
+                            <constraint firstItem="rvS-Wc-qH0" firstAttribute="centerY" secondItem="wyN-Sw-Yo0" secondAttribute="centerY" id="jbB-xR-4pu"/>
+                            <constraint firstItem="G2e-lU-zjA" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="14" id="qSl-XT-8ZA"/>
+                            <constraint firstItem="hpW-8d-S0N" firstAttribute="leading" secondItem="rvS-Wc-qH0" secondAttribute="trailing" constant="29" id="sbc-Dr-Qgg"/>
+                            <constraint firstItem="wyN-Sw-Yo0" firstAttribute="leading" secondItem="kNB-8o-LKu" secondAttribute="trailing" constant="12" id="to2-OE-ol8"/>
+                            <constraint firstItem="7cL-pi-vJL" firstAttribute="leading" secondItem="x5L-0P-Oih" secondAttribute="trailing" constant="6" id="u8V-k2-ZNJ"/>
+                            <constraint firstItem="x5L-0P-Oih" firstAttribute="leading" secondItem="xXM-qv-AHk" secondAttribute="trailing" constant="23" id="ulL-5N-lwO"/>
+                            <constraint firstItem="7cL-pi-vJL" firstAttribute="centerY" secondItem="x5L-0P-Oih" secondAttribute="centerY" id="vX6-XY-PYI"/>
+                            <constraint firstItem="kNB-8o-LKu" firstAttribute="centerY" secondItem="5Cg-eh-gtb" secondAttribute="centerY" id="xWg-Mq-VUO"/>
+                        </constraints>
                     </view>
+                    <connections>
+                        <outlet property="boldButton" destination="5Cg-eh-gtb" id="XRH-dI-uBm"/>
+                        <outlet property="bulletedListButton" destination="rvS-Wc-qH0" id="QHp-Ss-yjg"/>
+                        <outlet property="decreaseIndentButton" destination="hpW-8d-S0N" id="ukW-Pp-ptu"/>
+                        <outlet property="increaseIndentButton" destination="xXM-qv-AHk" id="qqB-AZ-q4u"/>
+                        <outlet property="italicButton" destination="kNB-8o-LKu" id="z87-NE-ebp"/>
+                        <outlet property="richTextEditor" destination="756-Yc-7La" id="g8X-Ep-aEK"/>
+                        <outlet property="underlineButton" destination="wyN-Sw-Yo0" id="Z2F-xr-Qnw"/>
+                    </connections>
                 </viewController>
                 <customObject id="rPt-NT-nkU" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="75" y="655"/>
+            <point key="canvasLocation" x="391" y="813"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="bold" width="48" height="48"/>
+        <image name="bulleted-list" width="48" height="48"/>
+        <image name="indent-decrease" width="48" height="48"/>
+        <image name="indent-increase" width="48" height="48"/>
+        <image name="italic" width="48" height="48"/>
+        <image name="underline" width="48" height="48"/>
+    </resources>
 </document>
