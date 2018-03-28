@@ -59,10 +59,6 @@
 @property NSInteger MAX_INDENT;
 @property BOOL isInTextDidChange;
 
-@property CGFloat fontSizeChangeAmount;
-@property CGFloat maxFontSize;
-@property CGFloat minFontSize;
-
 @property NSString *BULLET_STRING;
 
 @property NSUInteger levelsOfUndo;

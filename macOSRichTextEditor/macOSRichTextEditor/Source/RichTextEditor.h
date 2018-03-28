@@ -108,6 +108,16 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 // Defaults to YES.
 @property BOOL allowsRichTextPasteOnlyFromThisClass;
 
+// Amount to change font size on each increase/decrease font size call.
+// Defaults to 10.0f
+@property CGFloat fontSizeChangeAmount;
+
+// Maximum font size. Defaults to 128.0f
+@property CGFloat maxFontSize;
+
+// Minimum font size. Defaults to 10.0f
+@property CGFloat minFontSize;
+
 +(NSString*)pasteboardDataType;
 
 // call these methods when the user does the given action (clicks bold button, etc.)
