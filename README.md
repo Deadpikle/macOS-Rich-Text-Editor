@@ -16,24 +16,37 @@ Based upon the Rich Text Editor [here](https://github.com/Deadpikle/iOS-Rich-Tex
 
 - [ ] Tab/spaces consistency
 - [x] Starting bracket for function/conditional on same line as function name or conditional instead of next line
-- [ ] Create an example with a working GUI
+- [x] Create an example with a working GUI
 - [ ] Show how to call/use from Swift 4
 - [ ] Get this on Cocoapods
-- [ ] Framework output (Carthage too?)
+- [x] Framework output (Carthage too?)
 
 ### Features:
 
 - Bold
 - Italic
 - Underline
-- Strikethrough
 - Font
 - Font size
 - Text background color
-- Text foregroud color
+- Text foreground color
 - Text alignment
-- Paragraph Indent/Outdent
+- Paragraph indent/outdent
 - Bulleted lists
+
+#### Keyboard Shortcuts
+
+| Shortcut  | Action |
+| ------------- | ------------- |
+| ⌘ + B  | Toggle bold  |
+| ⌘ + I  | Toggle italic  |
+| ⌘ + U  | Toggle underline  |
+| ⌘ + ⇧ + >  | Increase font size |
+| ⌘ + ⇧ + <  | Decrease font size |
+| ⌘ + ⇧ + L  | Toggle bulleted list |
+| ⌘ + ⇧ + N  | If in bulleted list, leave bulleted list |
+| ⌘ + ⇧ + T  | Decrease indent |
+| ⌘ + T  | Increase indent |
 
 #### Scaling Text [TODO: move to Wiki]
 
