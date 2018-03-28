@@ -12,7 +12,7 @@ To use this library, you only need eight files:
     
 You can copy these files directly into your project, or you can choose to build and use the `.framework` output. Remember to open the `.xcworkspace` file when exploring this project.
 
-This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor](https://github.com/aryaxt/iOS-Rich-Text-Editor) by [Aryaxt](https://github.com/aryaxt).
+This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor](https://github.com/aryaxt/iOS-Rich-Text-Editor) by [aryaxt](https://github.com/aryaxt).
 
 ### Features:
 
@@ -89,4 +89,4 @@ If you want to scale text, you can use code similar to the following (based on h
 Credits
 -------------------------
 
-Original Rich Text Editor code by aryaxt at [iOS Rich Text Editor](https://github.com/aryaxt/iOS-Rich-Text-Editor). `WZProtocolInterceptor` is from [here](http://stackoverflow.com/a/18777565/3938401).
+Original Rich Text Editor code by [aryaxt](https://github.com/aryaxt) at the [iOS Rich Text Editor repo](https://github.com/aryaxt/iOS-Rich-Text-Editor). `WZProtocolInterceptor` is from [this SO post](http://stackoverflow.com/a/18777565/3938401).
