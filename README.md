@@ -3,14 +3,16 @@ macOS Rich Text Editor
 
 The macOS Rich Text Editor library allows for rich text editing via a native `NSTextView` You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. formatting for you. The sample should give you some guidance on how this could be accomplished.
 
--You only need 8 files:
+To use this library, you only need eight files:
 
 	- RichTextEditor.h/m
 	- NSFont+RichTextEditor.h/m
 	- NSAttributedString+RichTextEditor.h/m
 	- WZProtocolInterceptor.h/m
+    
+You can copy these files directly into your project, or you can choose to build and use the `.framework` output. Remember to open the `.xcworkspace` file when exploring this project.
 
-Based upon the Rich Text Editor [here](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the original code [here](https://github.com/aryaxt/iOS-Rich-Text-Editor).
+This library is ased upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor]((https://github.com/aryaxt/iOS-Rich-Text-Editor)) by [Aryaxt](https://github.com/aryaxt).
 
 ### TODO
 

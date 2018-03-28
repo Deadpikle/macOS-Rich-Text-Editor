@@ -2,10 +2,10 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:macOSRTESample/macOSRTESample.xcodeproj">
+      location = "group:Sample/macOSRTESample.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:macOSRichTextEditor/macOSRichTextEditor.xcodeproj">
+      location = "group:Library/macOSRichTextEditor.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:README.md">
