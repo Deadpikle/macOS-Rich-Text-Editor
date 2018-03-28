@@ -28,8 +28,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// Make sure to call removeTextObserverForDealloc before going away (forever) from the screen with the RTE (TODO: We should find a better way for this and fix it!)
-
 // TODO: better documentation
 // TODO: Clean up, clean up, everybody do your share!
 

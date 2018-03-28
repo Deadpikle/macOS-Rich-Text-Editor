@@ -50,10 +50,6 @@
 // Gets set to NO  when the user changes selection or starts typing
 @property (nonatomic, assign) BOOL typingAttributesInProgress;
 
-// The RTE will not be deallocated while the text observer is active. It is the RTE owner's
-// responsibility to call the removeTextObserverForDealloc function.
-@property id textObserver;
-
 @property float currSysVersion;
 
 @property NSInteger MAX_INDENT;
