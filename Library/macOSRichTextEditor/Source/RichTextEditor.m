@@ -28,11 +28,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-// May want to implement https://github.com/sweetmandm/Auto-List-Continuation-For-UITextView/blob/master/AutomaticBulletAndNumberLists.m
-// The above link would help with the initial bullet creation, perhaps, but not with "user has big selection of multiple paragraphs and
-// wants to put them all in a bulleted list", which userSelectedBullet takes care of.
-
-//https://developer.apple.com/library/mac/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW1
+// Text editing architecture guide: https://developer.apple.com/library/mac/documentation/TextFonts/Conceptual/CocoaTextArchitecture/TextEditing/TextEditing.html#//apple_ref/doc/uid/TP40009459-CH3-SW1
 
 #import "RichTextEditor.h"
 #import <QuartzCore/QuartzCore.h>
