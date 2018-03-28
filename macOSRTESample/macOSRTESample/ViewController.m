@@ -17,6 +17,7 @@
 
 @implementation NSImage (Tint)
 
+// https://stackoverflow.com/a/16138027/3938401
 - (NSImage *)imageTintedWithColor:(NSColor *)tint {
     NSImage *image = [self copy];
     if (tint) {
