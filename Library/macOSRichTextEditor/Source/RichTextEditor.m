@@ -41,7 +41,10 @@
 #import "WZProtocolInterceptor.h"
 #import  <objc/runtime.h>
 
-// removed first tab in lieu of using indents for bulleted lists
+typedef NS_ENUM(NSInteger, ParagraphIndentation) {
+    ParagraphIndentationIncrease,
+    ParagraphIndentationDecrease
+};
 
 @interface RichTextEditor () <NSTextViewDelegate> {
 }

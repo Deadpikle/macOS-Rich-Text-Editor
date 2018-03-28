@@ -86,11 +86,6 @@ typedef NS_ENUM(NSInteger, RichTextEditorPreviewChange) {
 
 @end
 
-typedef NS_ENUM(NSInteger, ParagraphIndentation) {
-    ParagraphIndentationIncrease,
-    ParagraphIndentationDecrease
-};
-
 @interface RichTextEditor : NSTextView
 
 @property (assign) IBOutlet id <RichTextEditorDataSource> rteDataSource;
@@ -98,65 +93,110 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 @property (nonatomic, assign) CGFloat defaultIndentationSize;
 @property (nonatomic, readonly) unichar lastSingleKeyPressed;
 
-// If YES, only pastes text as rich text if the copy operation came from this class.
-// Note: not this *object* -- this class (so other RichTextEditor boxes can paste
-// between each other). If the text did not come from a RichTextEditor box, then
-// pastes as plain text.
-// If NO, performs the default paste: operation.
-// Defaults to YES.
+/// If YES, only pastes text as rich text if the copy operation came from this class.
+/// Note: not this *object* -- this class (so other RichTextEditor boxes can paste
+/// between each other). If the text did not come from a RichTextEditor box, then
+/// pastes as plain text.
+/// If NO, performs the default paste: operation.
+/// Defaults to YES.
 @property BOOL allowsRichTextPasteOnlyFromThisClass;
 
-// Amount to change font size on each increase/decrease font size call.
-// Defaults to 10.0f
+/// Amount to change font size on each increase/decrease font size call.
+/// Defaults to 10.0f
 @property CGFloat fontSizeChangeAmount;
 
-// Maximum font size. Defaults to 128.0f
+/// Maximum font size. Defaults to 128.0f.
 @property CGFloat maxFontSize;
 
-// Minimum font size. Defaults to 10.0f
+/// Minimum font size. Defaults to 10.0f.
 @property CGFloat minFontSize;
 
+/// Pasteboard type string used when copying text from this NSTextView.
 +(NSString*)pasteboardDataType;
 
-// call these methods when the user does the given action (clicks bold button, etc.)
+/// Call the following methods when the user does the given action (clicks bold button, etc.)
+
+/// Toggle bold.
 - (void)userSelectedBold;
+
+/// Toggle italic.
 - (void)userSelectedItalic;
+
+/// Toggle underline.
 - (void)userSelectedUnderline;
+
+/// Toggle bulleted list.
 - (void)userSelectedBullet;
+
+/// Increase the total indentation of the current paragraph.
 - (void)userSelectedIncreaseIndent;
+
+/// Decrease the total indentation of the current paragraph.
 - (void)userSelectedDecreaseIndent;
+
+/// Change the text background (highlight) color for the currently selected text.
 - (void)userSelectedTextBackgroundColor:(NSColor*)color;
+
+/// Change the text color for the currently selected text.
 - (void)userSelectedTextColor:(NSColor*)color;
 
+/// Perform an undo operation if one is available.
 - (void)undo;
+
+/// Perform a redo operation if one is available.
 - (void)redo;
 
+/// Change the currently selected text to the given font name.
 - (void)userChangedToFontName:(NSString*)fontName;
+
+/// Change the currently selected text to the specified font size.
 - (void)userChangedToFontSize:(NSNumber*)fontSize;
 
+/// Increases the font size of the currently selected text by self.fontSizeChangeAmount.
 - (void)increaseFontSize;
+
+/// Decreases the font size of the currently selected text by self.fontSizeChangeAmount.
 - (void)decreaseFontSize;
 
+/// Toggles whether or not the paragraphs in the currently selected text have a first
+/// line head indent value of self.defaultIndentationSize.
 - (void)userSelectedParagraphFirstLineHeadIndent;
+
+/// Change the text alignment for the paragraphs in the currently selected text.
 - (void)userSelectedTextAlignment:(NSTextAlignment)textAlignment;
 
-- (BOOL)hasSelection; // convenience method; YES if user has something selected
+/// Convenience method; YES if user has something selected (selection length > 0).
+- (BOOL)hasSelection;
 
+/// Changes the editor's contents to the given attributed string.
 - (void)changeToAttributedString:(NSAttributedString*)string;
 
+/// Convenience method to set the editor's border color.
 - (void)setBorderColor:(NSColor*)borderColor;
+
+/// Convenience method to set the editor's border width.
 - (void)setBorderWidth:(CGFloat)borderWidth;
 
+/// Converts the current NSAttributedString to an HTML string.
 - (NSString *)htmlString;
+
+/// Converts the provided htmlString into an NSAttributedString and then
+/// sets the editor's text to the attributed string.
 - (void)setHtmlString:(NSString *)htmlString;
 
+/// Grabs the NSString used as the bulleted list prefix.
 - (NSString*)bulletString;
 
+/// Converts the provided NSAttributedString into an HTML string.
 + (NSString *)htmlStringFromAttributedText:(NSAttributedString*)text;
+
+/// Converts the given HTML string into an NSAttributedString.
 + (NSAttributedString*)attributedStringFromHTMLString:(NSString *)htmlString;
 
+/// Converts a given RichTextEditorPreviewChange to a human-readable string
 + (NSString *)convertPreviewChangeTypeToString:(RichTextEditorPreviewChange)changeType withNonSpecialChangeText:(BOOL)shouldReturnStringForNonSpecialType;
 
+// // // // // // // // // // // // // // // // // // // //
 // I'm not sure why you'd call these externally, but subclasses can make use of this for custom toolbar items or what have you.
 // It's just easier to put these in the public header than to have a protected/subclasses-only header.
 -(void)sendDelegatePreviewChangeOfType:(RichTextEditorPreviewChange)type;
