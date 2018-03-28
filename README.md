@@ -14,15 +14,6 @@ You can copy these files directly into your project, or you can choose to build 
 
 This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor]((https://github.com/aryaxt/iOS-Rich-Text-Editor)) by [Aryaxt](https://github.com/aryaxt).
 
-### TODO
-
-- [ ] Tab/spaces consistency
-- [x] Starting bracket for function/conditional on same line as function name or conditional instead of next line
-- [x] Create an example with a working GUI
-- [ ] Show how to call/use from Swift 4
-- [ ] Get this on Cocoapods
-- [x] Framework output (Carthage too?)
-
 ### Features:
 
 - Bold
