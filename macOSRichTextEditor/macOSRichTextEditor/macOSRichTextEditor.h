@@ -16,4 +16,6 @@ FOUNDATION_EXPORT const unsigned char macOSRichTextEditorVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <macOSRichTextEditor/PublicHeader.h>
 
-
+#include <macOSRichTextEditor/RichTextEditor.h>
+#include <macOSRichTextEditor/NSFont+RichTextEditor.h>
+#include <macOSRichTextEditor/NSAttributedString+RichTextEditor.h>
