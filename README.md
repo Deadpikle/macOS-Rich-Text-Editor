@@ -12,7 +12,7 @@ To use this library, you only need eight files:
     
 You can copy these files directly into your project, or you can choose to build and use the `.framework` output. Remember to open the `.xcworkspace` file when exploring this project.
 
-This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor]((https://github.com/aryaxt/iOS-Rich-Text-Editor)) by [Aryaxt](https://github.com/aryaxt).
+This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com/Deadpikle/iOS-Rich-Text-Editor), which was edited from the [original iOS rich text editor](https://github.com/aryaxt/iOS-Rich-Text-Editor) by [Aryaxt](https://github.com/aryaxt).
 
 ### Features:
 
