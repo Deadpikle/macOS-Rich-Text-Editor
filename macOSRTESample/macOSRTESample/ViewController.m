@@ -2,7 +2,7 @@
 //  ViewController.m
 //  macOSRTESample
 //
-//  Created by School of Computing Macbook on 3/28/18.
+//  Created by Deadpikle on 3/28/18.
 //  Copyright © 2018 Pikle Productions. All rights reserved.
 //
 
@@ -138,7 +138,7 @@
     else {
         self.bulletedListButton.image = [[NSImage imageNamed:@"bulleted-list"] imageTintedWithColor:NSColor.blackColor];
     }
-    
+    self.fontColorWell.color = textColor;
 }
 
 @end

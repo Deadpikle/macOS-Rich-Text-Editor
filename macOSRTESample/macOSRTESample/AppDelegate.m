@@ -2,7 +2,7 @@
 //  AppDelegate.m
 //  macOSRTESample
 //
-//  Created by School of Computing Macbook on 3/28/18.
+//  Created by Deadpikle on 3/28/18.
 //  Copyright © 2018 Pikle Productions. All rights reserved.
 //
 
