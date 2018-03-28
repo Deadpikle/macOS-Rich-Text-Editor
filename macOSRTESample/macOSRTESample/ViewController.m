@@ -42,6 +42,8 @@
 @property (weak) IBOutlet NSButton *bulletedListButton;
 @property (weak) IBOutlet NSButton *decreaseIndentButton;
 @property (weak) IBOutlet NSButton *increaseIndentButton;
+@property (weak) IBOutlet NSColorWell *fontColorWell;
+@property (weak) IBOutlet NSColorWell *highlightColorWell;
 
 -(IBAction)toggleBold:(id)sender;
 -(IBAction)toggleItalic:(id)sender;
@@ -54,6 +56,9 @@
 
 -(IBAction)decreaseFontSize:(id)sender;
 -(IBAction)increaseFontSize:(id)sender;
+
+- (IBAction)fontColorChanged:(id)sender;
+- (IBAction)highlightColorChanged:(id)sender;
 
 @end
 
@@ -94,6 +99,14 @@
 
 -(IBAction)increaseFontSize:(id)sender {
     [self.richTextEditor increaseFontSize];
+}
+
+- (IBAction)fontColorChanged:(id)sender {
+    [self.richTextEditor userSelectedTextColor:self.fontColorWell.color];
+}
+
+- (IBAction)highlightColorChanged:(id)sender {
+    [self.richTextEditor userSelectedTextBackgroundColor:self.highlightColorWell.color];
 }
 
 - (void)richTextEditor:(RichTextEditor*)editor changeAboutToOccurOfType:(RichTextEditorPreviewChange)type {

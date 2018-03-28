@@ -689,6 +689,7 @@
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
                         <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+                        <value key="minSize" type="size" width="640" height="480"/>
                         <connections>
                             <outlet property="delegate" destination="B8D-0N-5wS" id="98r-iN-zZc"/>
                         </connections>
@@ -723,12 +724,184 @@
                                     <rect key="frame" x="1" y="1" width="623" height="410"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <textView importsGraphics="NO" verticallyResizable="YES" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="756-Yc-7La" customClass="RichTextEditor">
+                                        <textView importsGraphics="NO" verticallyResizable="YES" baseWritingDirection="leftToRight" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="756-Yc-7La" customClass="RichTextEditor">
                                             <rect key="frame" x="0.0" y="0.0" width="623" height="410"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                             <size key="minSize" width="623" height="410"/>
                                             <size key="maxSize" width="480623" height="10000000"/>
+                                            <attributedString key="textStorage">
+                                                <fragment content="Lorem">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content=" ipsum">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="Arial-ItalicMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content=" dolor sit amet,">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content=" consectetur adipiscin">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="0.50922087585034015" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="g ">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="elit, s">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="ed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content=" veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequ">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="Arial-BoldMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="a">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="t. Duis aute irure dolor in reprehenderit in voluptate ve">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="Arial-BoldItalicMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="lit esse cillum dol">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="ore eu fugiat nulla pariatur. Excepteur sint occaecat c">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="18" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                                <fragment content="upidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.">
+                                                    <attributes>
+                                                        <color key="NSBackgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="NSColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <font key="NSFont" size="14" name="ArialMT"/>
+                                                        <real key="NSKern" value="0.0"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="natural" lineBreakMode="wordWrapping" baseWritingDirection="leftToRight" minimumLineHeight="16" defaultTabInterval="36" tighteningFactorForTruncation="0.0">
+                                                            <tabStops/>
+                                                        </paragraphStyle>
+                                                        <color key="NSStrokeColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <real key="NSStrokeWidth" value="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
                                             <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                                         </textView>
                                     </subviews>
@@ -757,7 +930,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kNB-8o-LKu">
-                                <rect key="frame" x="42" y="411" width="40" height="32"/>
+                                <rect key="frame" x="40" y="411" width="40" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="ovJ-mc-VnM"/>
                                 </constraints>
@@ -770,7 +943,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wyN-Sw-Yo0">
-                                <rect key="frame" x="82" y="411" width="40" height="32"/>
+                                <rect key="frame" x="78" y="411" width="40" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="6Sa-cF-GSQ"/>
                                 </constraints>
@@ -783,7 +956,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rvS-Wc-qH0">
-                                <rect key="frame" x="131" y="411" width="40" height="32"/>
+                                <rect key="frame" x="116" y="411" width="40" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="XXD-Go-sCY"/>
                                 </constraints>
@@ -796,7 +969,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hpW-8d-S0N">
-                                <rect key="frame" x="188" y="411" width="40" height="32"/>
+                                <rect key="frame" x="154" y="411" width="40" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="p1p-NP-Y4W"/>
                                 </constraints>
@@ -809,7 +982,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xXM-qv-AHk">
-                                <rect key="frame" x="228" y="411" width="40" height="32"/>
+                                <rect key="frame" x="192" y="411" width="40" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="28" id="7od-vo-cLe"/>
                                 </constraints>
@@ -822,7 +995,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="x5L-0P-Oih">
-                                <rect key="frame" x="279" y="411" width="157" height="32"/>
+                                <rect key="frame" x="230" y="411" width="157" height="32"/>
                                 <buttonCell key="cell" type="push" title="Decrease Font Size" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="W0s-3F-tig">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -832,7 +1005,7 @@
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="7cL-pi-vJL">
-                                <rect key="frame" x="430" y="411" width="152" height="32"/>
+                                <rect key="frame" x="381" y="411" width="152" height="32"/>
                                 <buttonCell key="cell" type="push" title="Increase Font Size" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FXw-2J-zOR">
                                     <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                     <font key="font" metaFont="system"/>
@@ -841,9 +1014,31 @@
                                     <action selector="increaseFontSize:" target="XfG-lQ-9wD" id="hej-R4-0Ep"/>
                                 </connections>
                             </button>
+                            <colorWell translatesAutoresizingMaskIntoConstraints="NO" id="1iq-kC-lvF">
+                                <rect key="frame" x="537" y="417" width="32" height="23"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="32" id="2sG-6K-6ck"/>
+                                    <constraint firstAttribute="height" constant="23" id="vI6-Ye-OGh"/>
+                                </constraints>
+                                <color key="color" red="0.05813049898" green="0.055541899059999997" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <connections>
+                                    <action selector="fontColorChanged:" target="XfG-lQ-9wD" id="7jN-20-yKW"/>
+                                </connections>
+                            </colorWell>
+                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UY9-XX-bWP">
+                                <rect key="frame" x="535" y="443" width="32" height="17"/>
+                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Font" id="04W-Kw-2f1">
+                                    <font key="font" metaFont="system"/>
+                                    <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                </textFieldCell>
+                            </textField>
                         </subviews>
                         <constraints>
-                            <constraint firstItem="xXM-qv-AHk" firstAttribute="leading" secondItem="hpW-8d-S0N" secondAttribute="trailing" constant="12" id="2Jo-mJ-v60"/>
+                            <constraint firstItem="UY9-XX-bWP" firstAttribute="leading" secondItem="1iq-kC-lvF" secondAttribute="leading" id="0iU-xq-rXA"/>
+                            <constraint firstItem="xXM-qv-AHk" firstAttribute="leading" secondItem="hpW-8d-S0N" secondAttribute="trailing" constant="10" id="2Jo-mJ-v60"/>
+                            <constraint firstItem="1iq-kC-lvF" firstAttribute="centerY" secondItem="7cL-pi-vJL" secondAttribute="centerY" id="7B3-VQ-CfU"/>
+                            <constraint firstItem="1iq-kC-lvF" firstAttribute="top" secondItem="UY9-XX-bWP" secondAttribute="bottom" constant="3" id="DUv-dj-uZG"/>
                             <constraint firstItem="wyN-Sw-Yo0" firstAttribute="centerY" secondItem="kNB-8o-LKu" secondAttribute="centerY" id="JS1-4M-Th1"/>
                             <constraint firstItem="5Cg-eh-gtb" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="41" id="O7E-y6-AqK"/>
                             <constraint firstAttribute="bottom" secondItem="PhS-1d-JEf" secondAttribute="bottom" id="OON-Gh-jzk"/>
@@ -851,19 +1046,20 @@
                             <constraint firstItem="xXM-qv-AHk" firstAttribute="centerY" secondItem="hpW-8d-S0N" secondAttribute="centerY" id="PRi-UG-M6j"/>
                             <constraint firstAttribute="trailing" secondItem="PhS-1d-JEf" secondAttribute="trailing" id="Pbn-cf-xEf"/>
                             <constraint firstItem="hpW-8d-S0N" firstAttribute="centerY" secondItem="rvS-Wc-qH0" secondAttribute="centerY" id="R8u-J1-Baf"/>
-                            <constraint firstItem="kNB-8o-LKu" firstAttribute="leading" secondItem="5Cg-eh-gtb" secondAttribute="trailing" constant="12" id="RT3-hL-ieM"/>
+                            <constraint firstItem="kNB-8o-LKu" firstAttribute="leading" secondItem="5Cg-eh-gtb" secondAttribute="trailing" constant="10" id="RT3-hL-ieM"/>
                             <constraint firstItem="5Cg-eh-gtb" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="Tn4-Wz-eia"/>
                             <constraint firstItem="PhS-1d-JEf" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="ZGp-U8-t8e"/>
                             <constraint firstItem="G2e-lU-zjA" firstAttribute="centerX" secondItem="m2S-Jp-Qdl" secondAttribute="centerX" id="dnY-1l-jFS"/>
-                            <constraint firstItem="rvS-Wc-qH0" firstAttribute="leading" secondItem="wyN-Sw-Yo0" secondAttribute="trailing" constant="21" id="hjD-Yl-oEv"/>
+                            <constraint firstItem="rvS-Wc-qH0" firstAttribute="leading" secondItem="wyN-Sw-Yo0" secondAttribute="trailing" constant="10" id="hjD-Yl-oEv"/>
                             <constraint firstItem="x5L-0P-Oih" firstAttribute="centerY" secondItem="xXM-qv-AHk" secondAttribute="centerY" id="iRv-YV-yfr"/>
                             <constraint firstItem="rvS-Wc-qH0" firstAttribute="centerY" secondItem="wyN-Sw-Yo0" secondAttribute="centerY" id="jbB-xR-4pu"/>
                             <constraint firstItem="G2e-lU-zjA" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="14" id="qSl-XT-8ZA"/>
-                            <constraint firstItem="hpW-8d-S0N" firstAttribute="leading" secondItem="rvS-Wc-qH0" secondAttribute="trailing" constant="29" id="sbc-Dr-Qgg"/>
-                            <constraint firstItem="wyN-Sw-Yo0" firstAttribute="leading" secondItem="kNB-8o-LKu" secondAttribute="trailing" constant="12" id="to2-OE-ol8"/>
+                            <constraint firstItem="hpW-8d-S0N" firstAttribute="leading" secondItem="rvS-Wc-qH0" secondAttribute="trailing" constant="10" id="sbc-Dr-Qgg"/>
+                            <constraint firstItem="wyN-Sw-Yo0" firstAttribute="leading" secondItem="kNB-8o-LKu" secondAttribute="trailing" constant="10" id="to2-OE-ol8"/>
                             <constraint firstItem="7cL-pi-vJL" firstAttribute="leading" secondItem="x5L-0P-Oih" secondAttribute="trailing" constant="6" id="u8V-k2-ZNJ"/>
-                            <constraint firstItem="x5L-0P-Oih" firstAttribute="leading" secondItem="xXM-qv-AHk" secondAttribute="trailing" constant="23" id="ulL-5N-lwO"/>
+                            <constraint firstItem="x5L-0P-Oih" firstAttribute="leading" secondItem="xXM-qv-AHk" secondAttribute="trailing" constant="10" id="ulL-5N-lwO"/>
                             <constraint firstItem="7cL-pi-vJL" firstAttribute="centerY" secondItem="x5L-0P-Oih" secondAttribute="centerY" id="vX6-XY-PYI"/>
+                            <constraint firstItem="1iq-kC-lvF" firstAttribute="leading" secondItem="7cL-pi-vJL" secondAttribute="trailing" constant="10" id="wDW-nr-jnf"/>
                             <constraint firstItem="kNB-8o-LKu" firstAttribute="centerY" secondItem="5Cg-eh-gtb" secondAttribute="centerY" id="xWg-Mq-VUO"/>
                         </constraints>
                     </view>
@@ -871,6 +1067,7 @@
                         <outlet property="boldButton" destination="5Cg-eh-gtb" id="XRH-dI-uBm"/>
                         <outlet property="bulletedListButton" destination="rvS-Wc-qH0" id="QHp-Ss-yjg"/>
                         <outlet property="decreaseIndentButton" destination="hpW-8d-S0N" id="ukW-Pp-ptu"/>
+                        <outlet property="fontColorWell" destination="1iq-kC-lvF" id="v69-Ng-qnB"/>
                         <outlet property="increaseIndentButton" destination="xXM-qv-AHk" id="qqB-AZ-q4u"/>
                         <outlet property="italicButton" destination="kNB-8o-LKu" id="z87-NE-ebp"/>
                         <outlet property="richTextEditor" destination="756-Yc-7La" id="g8X-Ep-aEK"/>

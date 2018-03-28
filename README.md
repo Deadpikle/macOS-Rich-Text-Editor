@@ -1,7 +1,7 @@
 macOS Rich Text Editor
 ==================
 
-You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. for you. Some day, in a perfect world, I'll update this with a proper example. Rest assured, however, that I (Deadpikle) am using this code in a presentation software package for speaker notes rich text editing, and it works rather well.
+The macOS Rich Text Editor library allows for rich text editing via a native `NSTextView` You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. formatting for you. The sample should give you some guidance on how this could be accomplished.
 
 -You only need 8 files:
 
