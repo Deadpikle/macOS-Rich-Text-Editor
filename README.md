@@ -1,7 +1,7 @@
 macOS Rich Text Editor
 ==================
 
-The macOS Rich Text Editor library allows for rich text editing via a native `NSTextView` You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. formatting for you. The sample should give you some guidance on how this could be accomplished.
+The macOS Rich Text Editor library allows for rich text editing via a native `NSTextView`. You will need to implement much of the UI yourself (buttons, handling selection changes via the delegate protocol, etc.). The RTE just handles the bold/italic/bulleted lists/etc. formatting for you. The sample should give you some guidance on how this could be accomplished.
 
 To use this library, you only need eight files:
 
