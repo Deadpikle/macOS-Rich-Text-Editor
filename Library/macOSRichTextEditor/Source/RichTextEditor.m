@@ -678,9 +678,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if (!self.isEditable) {
         return;
     }
-    if (!self.isInTextDidChange) {
-        [self sendDelegateTVChanged];
-    }
     [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
@@ -786,6 +783,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         [self userSelectedParagraphIndentation:ParagraphIndentationDecrease];
     }
 	self.selectedRange = rangeForSelection;
+    
+    if (!self.isInTextDidChange) {
+        [self sendDelegateTVChanged];
+    }
 }
 
 // modified from https://stackoverflow.com/a/4833778/3938401
