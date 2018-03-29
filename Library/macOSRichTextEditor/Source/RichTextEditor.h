@@ -35,14 +35,6 @@
 
 @class RichTextEditor;
 
-@protocol RichTextEditorDataSource <NSObject>
-
-@optional
-
-- (NSUInteger)levelsOfUndo;
-
-@end
-
 // These values will always start from 0 and go up. If you want to add your own
 // preview changes via a subclass, start from 9999 and go down (or similar) and
 // override convertPreviewChangeTypeToString:withNonSpecialChangeText:
@@ -67,6 +59,32 @@ typedef NS_ENUM(NSInteger, RichTextEditorPreviewChange) {
 	RichTextEditorPreviewChangeDelete           = 17,
     RichTextEditorPreviewChangeFindReplace      = 18
 };
+
+typedef NS_OPTIONS(NSUInteger, RichTextEditorShortcut) {
+    RichTextEditorShortcutAll                   = 0,
+    RichTextEditorShortcutBold                  = 1 << 0,
+    RichTextEditorShortcutItalic                = 1 << 1,
+    RichTextEditorShortcutUnderline             = 1 << 2,
+    RichTextEditorShortcutIncreaseFontSize      = 1 << 3,
+    RichTextEditorShortcutDecreaseFontSize      = 1 << 4,
+    RichTextEditorShortcutBulletedList          = 1 << 6,
+    RichTextEditorShortcutLeaveBulletedList     = 1 << 7,
+    RichTextEditorShortcutDecreaseIndent        = 1 << 8,
+    RichTextEditorShortcutIncreaseIndent        = 1 << 9
+};
+
+
+@protocol RichTextEditorDataSource <NSObject>
+
+@optional
+
+- (NSUInteger)levelsOfUndo;
+
+/// If you do not want to enable all keyboard shortcuts (e.g. if you don't want users to resize font ever),
+/// then you can use this data source callback to selectively enable keyboard shortcuts.
+- (RichTextEditorShortcut)enabledKeyboardShortcuts;
+
+@end
 
 @protocol RichTextEditorDelegate <NSObject>
 

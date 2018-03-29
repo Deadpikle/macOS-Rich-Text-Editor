@@ -1206,6 +1206,11 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 - (void)keyDown:(NSEvent*)event {
     NSString *key = event.charactersIgnoringModifiers;
     if (key.length > 0) {
+        NSUInteger enabledShortcuts = RichTextEditorShortcutAll;
+        if (self.rteDataSource && [self.rteDataSource respondsToSelector:@selector(enabledKeyboardShortcuts)]) {
+            enabledShortcuts = [self.rteDataSource enabledKeyboardShortcuts];
+        }
+        
         unichar keyChar = 0;
         bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
         bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
@@ -1216,31 +1221,40 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 			[self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeArrowKey];
 			[super keyDown:event];
         }
-        else if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown && !shiftKeyDown) {
+        else if ((keyChar == 'b' || keyChar == 'B') && commandKeyDown && !shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutBold)) {
             [self userSelectedBold];
         }
-        else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown && !shiftKeyDown) {
+        else if ((keyChar == 'i' || keyChar == 'I') && commandKeyDown && !shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutItalic)) {
             [self userSelectedItalic];
         }
-        else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown && !shiftKeyDown) {
+        else if ((keyChar == 'u' || keyChar == 'U') && commandKeyDown && !shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutUnderline)) {
             [self userSelectedUnderline];
         }
-        else if (keyChar == '>' && shiftKeyDown && commandKeyDown) {
+        else if (keyChar == '>' && shiftKeyDown && commandKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutIncreaseFontSize)) {
             [self increaseFontSize];
         }
-        else if (keyChar == '<' && shiftKeyDown && commandKeyDown) {
+        else if (keyChar == '<' && shiftKeyDown && commandKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutDecreaseFontSize)) {
             [self decreaseFontSize];
         }
-        else if (keyChar == 'L' && shiftKeyDown && commandKeyDown) {
+        else if (keyChar == 'L' && shiftKeyDown && commandKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutBulletedList)) {
             [self userSelectedBullet];
         }
-        else if (keyChar == 'N' && shiftKeyDown && commandKeyDown && [self isInBulletedList]) {
+        else if (keyChar == 'N' && shiftKeyDown && commandKeyDown && [self isInBulletedList] &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutLeaveBulletedList)) {
             [self userSelectedBullet];
         }
-        else if (keyChar == 'T' && shiftKeyDown && commandKeyDown) {
+        else if (keyChar == 'T' && shiftKeyDown && commandKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutDecreaseIndent)) {
             [self userSelectedDecreaseIndent];
         }
-        else if (keyChar == 't' && commandKeyDown && !shiftKeyDown) {
+        else if (keyChar == 't' && commandKeyDown && !shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutIncreaseIndent)) {
             [self userSelectedIncreaseIndent];
         }
         else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
