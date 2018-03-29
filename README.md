@@ -41,6 +41,8 @@ This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com
 | ⌘ + ⇧ + T  | Decrease indent |
 | ⌘ + T  | Increase indent |
 
+By default, all keyboard shortcuts are enabled. If you want to selectively enable some keyboard shortcuts, implement the `RichTextEditorDataSource` method `- (RichTextEditorShortcut)enabledKeyboardShortcuts`. If you want to do this, don't forget to set the `rteDataSource`!
+
 #### Scaling Text [TODO: move to Wiki]
 
 If you want to scale text, you can use code similar to the following (based on http://stackoverflow.com/a/14113905/3938401):
