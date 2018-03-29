@@ -788,6 +788,25 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 	self.selectedRange = rangeForSelection;
 }
 
+// modified from https://stackoverflow.com/a/4833778/3938401
+- (void)changeToFont:(NSFont*)font {
+    NSTextStorage *textStorage = self.textStorage;
+    [textStorage beginEditing];
+    [textStorage enumerateAttributesInRange: NSMakeRange(0, textStorage.length)
+                                    options: 0
+                                 usingBlock: ^(NSDictionary *attributesDictionary,
+                                               NSRange range,
+                                               BOOL *stop) {
+         NSFont *currFont = [attributesDictionary objectForKey:NSFontAttributeName];
+         if (currFont) {
+             NSFont *fontToChangeTo = [font fontWithBoldTrait:currFont.isBold andItalicTrait:currFont.isItalic];
+             [textStorage removeAttribute:NSFontAttributeName range:range];
+             [textStorage addAttribute:NSFontAttributeName value:fontToChangeTo range:range];
+         }
+     }];
+    [textStorage endEditing];
+}
+
 #pragma mark - Private Methods -
 
 - (void)enumarateThroughParagraphsInRange:(NSRange)range withBlock:(void (^)(NSRange paragraphRange))block{

@@ -164,6 +164,9 @@ typedef NS_OPTIONS(NSUInteger, RichTextEditorShortcut) {
 /// Perform a redo operation if one is available.
 - (void)redo;
 
+/// Convert the font for all text to the given font while keeping bold/italic attributes
+- (void)changeToFont:(NSFont*)font;
+
 /// Change the currently selected text to the given font name.
 - (void)userChangedToFontName:(NSString*)fontName;
 
