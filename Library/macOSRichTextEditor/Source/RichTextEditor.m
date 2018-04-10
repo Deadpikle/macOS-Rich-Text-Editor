@@ -210,6 +210,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if (charRange.length == 0) {
         self.lastAnchorPoint = charRange;
     }
+    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:charRange];
+    charRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andCurrent:charRange];
     [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
 }
 
@@ -260,11 +262,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 //NSLog(@"Will select right in overall left selection");
             }
         }
-    }
-    
-    else {
-        NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:newSelectedCharRange];
-        newSelectedCharRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andPrevious:oldSelectedCharRange andCurrent:newSelectedCharRange];
     }
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
@@ -1062,34 +1059,37 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 /**
  * Does not allow cursor to be right beside the bullet point.
  *
- * @param beginningRange The beginning position of the paragraph
- * @param previousRange The previous cursor position
+ * @param beginRange The beginning position of the paragraph
  * @param currentRange The current cursor position
  */
-- (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginningRange andPrevious:(NSRange)previousRange andCurrent:(NSRange)currentRange {
-    NSUInteger begin = beginningRange.location, previous = previousRange.location, current = currentRange.location;
+- (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginRange andCurrent:(NSRange)currentRange {
+    NSUInteger previous = self.previousCursorPosition;
+    NSUInteger begin = beginRange.location;
+    NSUInteger current = currentRange.location;
+    NSRange finalRange = currentRange;
     if (self.isInTextDidChange || self.justDeletedBackward) {
-        return NSMakeRange(current, 0);
+        return finalRange;
     }
     BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
     if (currentParagraphHasBullet) {
         if (begin == 0 && current <= 1) { // move cursor back to position 2
-            return NSMakeRange(2, 0);
+            finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(2, 0);
         }
         else if (begin > 0) {
             if ((current == begin && (previous > current || previous < current)) ||
                 (current == (begin + 1) && (previous < current || current == previous))) { // cursor moved from in bullet to front of bullet
-                return NSMakeRange(begin + 2, 0);
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
             else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
-                return NSMakeRange(begin - 1, 0);
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin - 1, 0);
             }
             else if (current == begin == previous) {
-                return NSMakeRange(begin + 2, 0);
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
         }
     }
-    return NSMakeRange(current, 0);
+    self.previousCursorPosition = finalRange.location;
+    return finalRange;
 }
 
 - (void)applyBulletListIfApplicable {
