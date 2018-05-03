@@ -801,8 +801,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
          NSFont *currFont = [attributesDictionary objectForKey:NSFontAttributeName];
          if (currFont) {
              NSFont *fontToChangeTo = [font fontWithBoldTrait:currFont.isBold andItalicTrait:currFont.isItalic];
-             [textStorage removeAttribute:NSFontAttributeName range:range];
-             [textStorage addAttribute:NSFontAttributeName value:fontToChangeTo range:range];
+             if (fontToChangeTo) {
+                 [textStorage removeAttribute:NSFontAttributeName range:range];
+                 [textStorage addAttribute:NSFontAttributeName value:fontToChangeTo range:range];
+             }
          }
      }];
     [textStorage endEditing];
