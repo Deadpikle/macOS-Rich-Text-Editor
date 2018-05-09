@@ -278,7 +278,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
     [self sendDelegateTypingAttrsUpdate];
-
     if (self.delegate && [self.delegate respondsToSelector:@selector(textViewDidChangeSelection:)]) {
         [self.delegate textViewDidChangeSelection:notification];
     }
@@ -1061,10 +1060,12 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 }
 
 /**
- * Does not allow cursor to be right beside the bullet point.
+ * Does not allow cursor to be right beside the bullet point. This method also does not allow selection of the bullet point itself.
  *
  * @param beginRange The beginning position of the paragraph
- * @param currentRange The current cursor position
+ * @param previousRange The previous cursor position before the new change
+ * @param currentRange The current cursor position after the new change
+ * @param mouse A boolean to check whether the requested change is a mouse event or a keyboard event
  */
 - (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginRange andPrevious:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)mouse {
     NSUInteger previous = self.previousCursorPosition;
@@ -1101,12 +1102,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             }
         }
     }
-    else {
-//        if (!mouse && [[self.attributedString.string substringFromIndex:begin] rangeOfString:@"\u2022"].location != NSNotFound) {
-//            NSLog(@"%@", [self.attributedString.string substringFromIndex:begin]);
-//        }
-        // TODO: select bullet point totally from outside the bullet point
-    }
+    
     self.previousCursorPosition = finalRange.location;
     return finalRange;
 }
@@ -1291,8 +1287,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
         
         unichar keyChar = 0;
-        bool shiftKeyDown = event.modifierFlags & NSEventModifierFlagShift;
-        bool commandKeyDown = event.modifierFlags & NSEventModifierFlagCommand;
+        bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
+        bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
         keyChar = [key characterAtIndex:0];
 		_lastSingleKeyPressed = keyChar;
         if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
