@@ -211,7 +211,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         self.lastAnchorPoint = charRange;
     }
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:charRange];
-    charRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andPrevious:NSMakeRange(NSNotFound, 0) andCurrent:charRange isMouseClick:YES];
+    charRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:charRange andCurrent:charRange isMouseClick:YES];
     [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
 }
 
@@ -253,8 +253,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
         else {
             NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
-            newSelectedCharRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andPrevious:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
-            
+            newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
             
             self.shouldEndColorChangeOnLeft = YES;
             if (oldSelectedCharRange.length < newSelectedCharRange.length) {
@@ -1061,13 +1060,14 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 
 /**
  * Does not allow cursor to be right beside the bullet point. This method also does not allow selection of the bullet point itself.
+ * It uses the previousCursorPosition property to save the previous cursor location.
  *
  * @param beginRange The beginning position of the paragraph
- * @param previousRange The previous cursor position before the new change
+ * @param previousRange The previous cursor position before the new change. Only used for keyboard change events
  * @param currentRange The current cursor position after the new change
  * @param mouse A boolean to check whether the requested change is a mouse event or a keyboard event
  */
-- (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginRange andPrevious:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)mouse {
+- (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)mouse {
     NSUInteger previous = self.previousCursorPosition;
     NSUInteger begin = beginRange.location;
     NSUInteger current = currentRange.location;
