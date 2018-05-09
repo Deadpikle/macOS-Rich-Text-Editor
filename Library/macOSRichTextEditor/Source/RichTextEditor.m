@@ -211,7 +211,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         self.lastAnchorPoint = charRange;
     }
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:charRange];
-    charRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andCurrent:charRange];
+    charRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andPrevious:NSMakeRange(NSNotFound, 0) andCurrent:charRange isMouseClick:YES];
     [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
 }
 
@@ -252,6 +252,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             self.shouldEndColorChangeOnLeft = NO;
         }
         else {
+            NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
+            newSelectedCharRange = [self moveCursorAroundBulletListIfApplicableWithBeginningLocation:rangeOfCurrentParagraph andPrevious:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
+            
+            
             self.shouldEndColorChangeOnLeft = YES;
             if (oldSelectedCharRange.length < newSelectedCharRange.length) {
                 // Bigger
@@ -1062,17 +1066,26 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
  * @param beginRange The beginning position of the paragraph
  * @param currentRange The current cursor position
  */
-- (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginRange andCurrent:(NSRange)currentRange {
+- (NSRange)moveCursorAroundBulletListIfApplicableWithBeginningLocation:(NSRange)beginRange andPrevious:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)mouse {
     NSUInteger previous = self.previousCursorPosition;
     NSUInteger begin = beginRange.location;
     NSUInteger current = currentRange.location;
     NSRange finalRange = currentRange;
-    if (self.isInTextDidChange || self.justDeletedBackward) {
+    if (self.justDeletedBackward) {
         return finalRange;
     }
+    
     BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
     if (currentParagraphHasBullet) {
-        if (begin == 0 && current <= 1) { // move cursor back to position 2
+        if (!mouse && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
+            if (previousRange.location > current) {
+                finalRange = NSMakeRange(begin, currentRange.length + 1);
+            }
+            else if (previousRange.location < current) {
+                finalRange = NSMakeRange(current + 1, currentRange.length - 1);
+            }
+        }
+        else if (begin == 0 && current <= 1) { // move cursor back to position 2
             finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(2, 0);
         }
         else if (begin > 0) {
@@ -1083,10 +1096,16 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin - 1, 0);
             }
-            else if (current == begin == previous) {
+            else if ((current == begin) && (begin == previous)) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
         }
+    }
+    else {
+//        if (!mouse && [[self.attributedString.string substringFromIndex:begin] rangeOfString:@"\u2022"].location != NSNotFound) {
+//            NSLog(@"%@", [self.attributedString.string substringFromIndex:begin]);
+//        }
+        // TODO: select bullet point totally from outside the bullet point
     }
     self.previousCursorPosition = finalRange.location;
     return finalRange;
@@ -1272,8 +1291,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
         
         unichar keyChar = 0;
-        bool shiftKeyDown = event.modifierFlags & NSShiftKeyMask;
-        bool commandKeyDown = event.modifierFlags & NSCommandKeyMask;
+        bool shiftKeyDown = event.modifierFlags & NSEventModifierFlagShift;
+        bool commandKeyDown = event.modifierFlags & NSEventModifierFlagCommand;
         keyChar = [key characterAtIndex:0];
 		_lastSingleKeyPressed = keyChar;
         if (keyChar == NSLeftArrowFunctionKey || keyChar == NSRightArrowFunctionKey ||
