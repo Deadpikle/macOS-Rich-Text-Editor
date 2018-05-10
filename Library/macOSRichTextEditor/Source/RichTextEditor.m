@@ -1099,9 +1099,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
     }
     
-    NSUInteger (^addPropertiesOfNSRange)(NSRange) = ^(NSRange range) {return range.length + range.location;};
     NSRange endingStringRange = [[self.attributedString.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
-    BOOL currentParagraphHasBulletAtTheEnd = (addPropertiesOfNSRange(endingStringRange) + currentRange.location) == addPropertiesOfNSRange(currentRange);
+    NSUInteger currentRangeAddedProperties = currentRange.location + currentRange.length;
+    NSUInteger previousRangeAddedProperties = previousRange.location + previousRange.length;
+    BOOL currentParagraphHasBulletAtTheEnd = (endingStringRange.length + endingStringRange.location + currentRange.location) == currentRangeAddedProperties;
     if (currentParagraphHasBulletAtTheEnd) {
         if (isMouseClick) {
             if (previousRange.length > current) {
@@ -1112,10 +1113,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             }
         }
         else {
-            if (addPropertiesOfNSRange(previousRange) < addPropertiesOfNSRange(currentRange)) {
+            if (previousRangeAddedProperties < currentRangeAddedProperties) {
                 finalRange = NSMakeRange(current, currentRange.length + 1);
             }
-            else if (addPropertiesOfNSRange(previousRange) > addPropertiesOfNSRange(currentRange)) {
+            else if (previousRangeAddedProperties > currentRangeAddedProperties) {
                 finalRange = NSMakeRange(current, currentRange.length - 1);
             }
         }
