@@ -262,7 +262,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 //NSLog(@"Will select right in overall left selection");
             }
         }
-        NSLog(@"WillChangeSelection Called");
         NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
         newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
     }
@@ -1068,7 +1067,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
  * @param isMouseClick A boolean to check whether the requested change is a mouse event or a keyboard event
  */
 - (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)isMouseClick {
-    NSUInteger previous = previousRange.location == NSNotFound ? self.previousCursorPosition : previousRange.location;
+    NSUInteger previous = self.previousCursorPosition;
     NSUInteger begin = beginRange.location;
     NSUInteger current = currentRange.location;
     NSRange finalRange = currentRange;
@@ -1086,10 +1085,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 finalRange = NSMakeRange(current + 1, currentRange.length - 1);
             }
         }
-        else if (begin == 0 && current <= 1) { // move cursor back to position 2
-            finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(2, 0);
-        }
-        else if (begin > 0) {
+        else {
             if ((current == begin && (previous > current || previous < current)) ||
                 (current == (begin + 1) && (previous < current || current == previous))) { // cursor moved from in bullet to front of bullet
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
@@ -1097,7 +1093,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin - 1, 0);
             }
-            else if ((current == begin) && (begin == previous)) {
+            else if ((current == begin) && (begin == previous) && isMouseClick) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
         }
