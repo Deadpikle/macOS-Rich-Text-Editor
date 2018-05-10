@@ -1067,7 +1067,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
  * @param currentRange The current cursor position after the new change
  * @param mouse A boolean to check whether the requested change is a mouse event or a keyboard event
  */
-- (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)mouse {
+- (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)isMouseClick {
     NSUInteger previous = self.previousCursorPosition;
     NSUInteger begin = beginRange.location;
     NSUInteger current = currentRange.location;
@@ -1078,7 +1078,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     
     BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
     if (currentParagraphHasBullet) {
-        if (!mouse && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
+        if (!isMouseClick && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
             if (previousRange.location > current) {
                 finalRange = NSMakeRange(begin, currentRange.length + 1);
             }
