@@ -1091,7 +1091,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
             else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
-                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin - 1, 0);
+                BOOL isNewLocationValid = (begin - 1) > [self.attributedString.string length] ? NO : YES;
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(isNewLocationValid ? begin - 1 : begin + 2, 0);
             }
             else if ((current == begin) && (begin == previous) && isMouseClick) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
