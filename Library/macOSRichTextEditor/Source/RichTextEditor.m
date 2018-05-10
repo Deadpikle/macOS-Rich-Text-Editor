@@ -211,7 +211,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         self.lastAnchorPoint = charRange;
     }
     NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:charRange];
-    charRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:charRange andCurrent:charRange isMouseClick:YES];
+    charRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:NSMakeRange(NSNotFound, 0) andCurrent:charRange isMouseClick:YES];
     [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
 }
 
@@ -252,9 +252,6 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             self.shouldEndColorChangeOnLeft = NO;
         }
         else {
-            NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
-            newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
-            
             self.shouldEndColorChangeOnLeft = YES;
             if (oldSelectedCharRange.length < newSelectedCharRange.length) {
                 // Bigger
@@ -265,6 +262,9 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 //NSLog(@"Will select right in overall left selection");
             }
         }
+        NSLog(@"WillChangeSelection Called");
+        NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
+        newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
     }
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
@@ -1065,10 +1065,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
  * @param beginRange The beginning position of the paragraph
  * @param previousRange The previous cursor position before the new change. Only used for keyboard change events
  * @param currentRange The current cursor position after the new change
- * @param mouse A boolean to check whether the requested change is a mouse event or a keyboard event
+ * @param isMouseClick A boolean to check whether the requested change is a mouse event or a keyboard event
  */
 - (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)isMouseClick {
-    NSUInteger previous = self.previousCursorPosition;
+    NSUInteger previous = previousRange.location == NSNotFound ? self.previousCursorPosition : previousRange.location;
     NSUInteger begin = beginRange.location;
     NSUInteger current = currentRange.location;
     NSRange finalRange = currentRange;
@@ -1076,8 +1076,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         return finalRange;
     }
     
-    BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
-    if (currentParagraphHasBullet) {
+    BOOL currentParagraphHasBulletInFront = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
+    if (currentParagraphHasBulletInFront) {
         if (!isMouseClick && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
             if (previousRange.location > current) {
                 finalRange = NSMakeRange(begin, currentRange.length + 1);
@@ -1099,6 +1099,28 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             }
             else if ((current == begin) && (begin == previous)) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
+            }
+        }
+    }
+    
+    NSUInteger (^addPropertiesOfNSRange)(NSRange) = ^(NSRange range) {return range.length + range.location;};
+    NSRange endingStringRange = [[self.attributedString.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
+    BOOL currentParagraphHasBulletAtTheEnd = (addPropertiesOfNSRange(endingStringRange) + currentRange.location) == addPropertiesOfNSRange(currentRange);
+    if (currentParagraphHasBulletAtTheEnd) {
+        if (isMouseClick) {
+            if (previousRange.length > current) {
+                finalRange = NSMakeRange(current, currentRange.length + 1);
+            }
+            else if (previousRange.length < current) {
+                finalRange = NSMakeRange(current, currentRange.length - 1);
+            }
+        }
+        else {
+            if (addPropertiesOfNSRange(previousRange) < addPropertiesOfNSRange(currentRange)) {
+                finalRange = NSMakeRange(current, currentRange.length + 1);
+            }
+            else if (addPropertiesOfNSRange(previousRange) > addPropertiesOfNSRange(currentRange)) {
+                finalRange = NSMakeRange(current, currentRange.length - 1);
             }
         }
     }
