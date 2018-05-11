@@ -57,6 +57,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 @property NSString *BULLET_STRING;
 
 @property NSUInteger levelsOfUndo;
+@property NSUInteger previousCursorPosition;
 
 @property BOOL inBulletedList;
 @property BOOL justDeletedBackward;
@@ -209,6 +210,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if (charRange.length == 0) {
         self.lastAnchorPoint = charRange;
     }
+    NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:charRange];
+    charRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:NSMakeRange(NSNotFound, 0) andCurrent:charRange isMouseClick:YES];
     [super setSelectedRange:charRange affinity:affinity stillSelecting:stillSelectingFlag];
 }
 
@@ -259,6 +262,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 //NSLog(@"Will select right in overall left selection");
             }
         }
+        NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:oldSelectedCharRange];
+        newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
     }
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
@@ -1052,6 +1057,76 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 	}
 	
 	return newFont;
+}
+
+/**
+ * Does not allow cursor to be right beside the bullet point. This method also does not allow selection of the bullet point itself.
+ * It uses the previousCursorPosition property to save the previous cursor location.
+ *
+ * @param beginRange The beginning position of the paragraph
+ * @param previousRange The previous cursor position before the new change. Only used for keyboard change events
+ * @param currentRange The current cursor position after the new change
+ * @param isMouseClick A boolean to check whether the requested change is a mouse event or a keyboard event
+ */
+- (NSRange)adjustSelectedRangeForBulletsWithStart:(NSRange)beginRange Previous:(NSRange)previousRange andCurrent:(NSRange)currentRange isMouseClick:(BOOL)isMouseClick {
+    NSUInteger previous = self.previousCursorPosition;
+    NSUInteger begin = beginRange.location;
+    NSUInteger current = currentRange.location;
+    NSRange finalRange = currentRange;
+    if (self.justDeletedBackward) {
+        return finalRange;
+    }
+    
+    BOOL currentParagraphHasBulletInFront = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
+    if (currentParagraphHasBulletInFront) {
+        if (!isMouseClick && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
+            if (previousRange.location > current) {
+                finalRange = NSMakeRange(begin, currentRange.length + 1);
+            }
+            else if (previousRange.location < current) {
+                finalRange = NSMakeRange(current + 1, currentRange.length - 1);
+            }
+        }
+        else {
+            if ((current == begin && (previous > current || previous < current)) ||
+                (current == (begin + 1) && (previous < current || current == previous))) { // cursor moved from in bullet to front of bullet
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
+            }
+            else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
+                BOOL isNewLocationValid = (begin - 1) > [self.attributedString.string length] ? NO : YES;
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(isNewLocationValid ? begin - 1 : begin + 2, 0);
+            }
+            else if ((current == begin) && (begin == previous) && isMouseClick) {
+                finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
+            }
+        }
+    }
+    
+    NSRange endingStringRange = [[self.attributedString.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
+    NSUInteger currentRangeAddedProperties = currentRange.location + currentRange.length;
+    NSUInteger previousRangeAddedProperties = previousRange.location + previousRange.length;
+    BOOL currentParagraphHasBulletAtTheEnd = (endingStringRange.length + endingStringRange.location + currentRange.location) == currentRangeAddedProperties;
+    if (currentParagraphHasBulletAtTheEnd) {
+        if (isMouseClick) {
+            if (previousRange.length > current) {
+                finalRange = NSMakeRange(current, currentRange.length + 1);
+            }
+            else if (previousRange.length < current) {
+                finalRange = NSMakeRange(current, currentRange.length - 1);
+            }
+        }
+        else {
+            if (previousRangeAddedProperties < currentRangeAddedProperties) {
+                finalRange = NSMakeRange(current, currentRange.length + 1);
+            }
+            else if (previousRangeAddedProperties > currentRangeAddedProperties) {
+                finalRange = NSMakeRange(current, currentRange.length - 1);
+            }
+        }
+    }
+    
+    self.previousCursorPosition = finalRange.location;
+    return finalRange;
 }
 
 - (void)applyBulletListIfApplicable {
