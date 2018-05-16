@@ -27,6 +27,10 @@ This library is based upon Deadpikle's [iOS Rich Text Editor](https://github.com
 - Paragraph indent/outdent
 - Bulleted lists
 
+### Compatibility
+
+The rich text editor is compatible with macOS 10.10+. It might work on older versions, but this has not been tested.
+
 #### Keyboard Shortcuts
 
 | Shortcut  | Action |

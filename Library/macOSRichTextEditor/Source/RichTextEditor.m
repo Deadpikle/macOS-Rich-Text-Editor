@@ -1189,7 +1189,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         NSString *checkString = self.BULLET_STRING;
         if (checkString.length > 1) {
             // chop off last letter and use that
-            checkString = [checkString substringToIndex:[checkString length]-1];
+            checkString = [checkString substringToIndex:checkString.length - 1];
         }
         //else return;
         NSUInteger checkStringLength = [checkString length];
