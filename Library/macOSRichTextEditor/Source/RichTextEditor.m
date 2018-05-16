@@ -62,6 +62,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 @property BOOL inBulletedList;
 @property BOOL justDeletedBackward;
 @property NSString *latestReplacementString;
+@property NSString *latestStringReplaced;
 
 @property (nonatomic) NSRange lastAnchorPoint;
 @property BOOL shouldEndColorChangeOnLeft;
@@ -135,6 +136,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     
     self.BULLET_STRING = @"•\u00A0"; // bullet is \u2022
     self.latestReplacementString = @"";
+    self.latestStringReplaced = @"";
     
     // Instead of hard-coding the default indentation size, which can make bulleted lists look a little
     // odd when increasing/decreasing their indent, use a \t character width instead
@@ -160,8 +162,18 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     }
 }
 
+- (BOOL)rangeExists:(NSRange)range {
+    return range.location != NSNotFound && range.location + range.length <= self.attributedString.length;
+}
+
 - (BOOL)textView:(NSTextView *)textView shouldChangeTextInRange:(NSRange)affectedCharRange replacementString:(NSString *)replacementString {
     self.latestReplacementString = replacementString;
+    if (affectedCharRange.length > 0 && [self rangeExists:affectedCharRange]) {
+        self.latestStringReplaced = [self.string substringWithRange:affectedCharRange];
+    }
+    else {
+        self.latestStringReplaced = @"";
+    }
     if ([replacementString isEqualToString:@"\n"]) {
         [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeEnter];
         self.inBulletedList = [self isInBulletedList];
@@ -289,6 +301,21 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         self.isInTextDidChange = YES;
 		[self applyBulletListIfApplicable];
         [self deleteBulletListWhenApplicable];
+        
+        if ([self.latestStringReplaced hasSuffix:@"\n"]) {
+            // get rest of paragraph as they just deleted a newline
+            NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
+            NSInteger rangeDiff = self.selectedRange.location - rangeOfCurrentParagraph.location;
+            if (rangeDiff >= 0) {
+                NSRange restOfLineRange = NSMakeRange(rangeOfCurrentParagraph.location + rangeDiff, rangeOfCurrentParagraph.length - rangeDiff);
+                NSString *restOfLine = [self.string substringWithRange:restOfLineRange];
+                if ([restOfLine hasPrefix:self.BULLET_STRING]) {
+                    // we must have deleted a newline under a previous list! Get rid of the bullet!
+                    [self.textStorage replaceCharactersInRange:NSMakeRange(restOfLineRange.location, self.BULLET_STRING.length) withString:@""];
+                }
+            }
+        }
+        
         self.isInTextDidChange = NO;
     }
     self.justDeletedBackward = NO;
@@ -618,7 +645,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     
     // After NSTextStorage changes, these don't seem necessary
    /* NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
-	BOOL currParagraphIsBlank = [[self.attributedString.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""] ? YES: NO;
+	BOOL currParagraphIsBlank = [[self.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""] ? YES: NO;
     if (currParagraphIsBlank)
     {
        // [self setIndentationWithAttributes:dictionary paragraphStyle:paragraphStyle atRange:rangeOfCurrentParagraph];
@@ -690,7 +717,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 	NSRange initialSelectedRange = self.selectedRange;
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
-	BOOL firstParagraphHasBullet = [[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
+	BOOL firstParagraphHasBullet = [[self.string substringFromIndex:rangeOfCurrentParagraph.location] hasPrefix:self.BULLET_STRING];
     
     NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location-1, 0)];
     NSDictionary *prevParaDict = [self dictionaryAtIndex:rangeOfPreviousParagraph.location];
@@ -708,7 +735,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 			paragraphStyle = [[NSMutableParagraphStyle alloc] init];
         }
 		
-		BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:range.location] hasPrefix:self.BULLET_STRING];
+		BOOL currentParagraphHasBullet = [[self.string substringFromIndex:range.location] hasPrefix:self.BULLET_STRING];
 		
         if (firstParagraphHasBullet != currentParagraphHasBullet) {
 			return;
@@ -750,7 +777,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 			CGSize expectedStringSize = [self.BULLET_STRING sizeWithAttributes:dictionary];
             
             // See if the previous paragraph has a bullet
-            NSString *previousParagraph = [self.attributedString.string substringWithRange:rangeOfPreviousParagraph];
+            NSString *previousParagraph = [self.string substringWithRange:rangeOfPreviousParagraph];
             BOOL doesPrefixWithBullet = [previousParagraph hasPrefix:self.BULLET_STRING];
             
             // Look at the previous paragraph to see what the firstLineHeadIndent should be for the
@@ -856,7 +883,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 }
 
 - (NSDictionary *)dictionaryAtIndex:(NSInteger)index {
-    if (![self hasText] || index == self.attributedString.string.length) {
+    if (![self hasText] || index == self.string.length) {
         return self.typingAttributes; // end of string, use whatever we're currently using
     }
     else {
@@ -1080,7 +1107,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         return finalRange;
     }
     
-    BOOL currentParagraphHasBulletInFront = [[self.attributedString.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
+    BOOL currentParagraphHasBulletInFront = [[self.string substringFromIndex:begin] hasPrefix:self.BULLET_STRING];
     if (currentParagraphHasBulletInFront) {
         if (!isMouseClick && (current == begin + 1)) { // select bullet point when using keyboard arrow keys
             if (previousRange.location > current) {
@@ -1096,7 +1123,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(begin + 2, 0);
             }
             else if (current == (begin + 1) && previous > current) { // cursor moved from in bullet to beside of bullet
-                BOOL isNewLocationValid = (begin - 1) > [self.attributedString.string length] ? NO : YES;
+                BOOL isNewLocationValid = (begin - 1) > [self.string length] ? NO : YES;
                 finalRange = currentRange.length >= 1 ? NSMakeRange(begin, finalRange.length + 1) : NSMakeRange(isNewLocationValid ? begin - 1 : begin + 2, 0);
             }
             else if ((current == begin) && (begin == previous) && isMouseClick) {
@@ -1105,7 +1132,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
     }
     
-    NSRange endingStringRange = [[self.attributedString.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
+    NSRange endingStringRange = [[self.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
     NSUInteger currentRangeAddedProperties = currentRange.location + currentRange.length;
     NSUInteger previousRangeAddedProperties = previousRange.location + previousRange.length;
     BOOL currentParagraphHasBulletAtTheEnd = (endingStringRange.length + endingStringRange.location + currentRange.location) == currentRangeAddedProperties;
@@ -1139,13 +1166,13 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     }
 	NSRange rangeOfPreviousParagraph = [self.attributedString firstParagraphRangeFromTextRange:NSMakeRange(rangeOfCurrentParagraph.location - 1, 0)];
     //self.replacementString
-    BOOL previousParagraphHasBullet = [[self.attributedString.string
+    BOOL previousParagraphHasBullet = [[self.string
                                         substringFromIndex:rangeOfPreviousParagraph.location] hasPrefix:self.BULLET_STRING];
     if (!self.inBulletedList) { // fixes issue with backspacing into bullet list adding a bullet
         //NSLog(@"[RTE] NOT in a bulleted list.");
-		BOOL currentParagraphHasBullet = [[self.attributedString.string substringFromIndex:rangeOfCurrentParagraph.location]
+		BOOL currentParagraphHasBullet = [[self.string substringFromIndex:rangeOfCurrentParagraph.location]
                                            hasPrefix:self.BULLET_STRING];
-        BOOL isCurrParaBlank = [[self.attributedString.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""];
+        BOOL isCurrParaBlank = [[self.string substringWithRange:rangeOfCurrentParagraph] isEqualToString:@""];
         // if we don't check to see if the current paragraph is blank, bad bugs happen with
         // the current paragraph where the selected range doesn't let the user type O_o
         if (previousParagraphHasBullet && !currentParagraphHasBullet && isCurrParaBlank) {
@@ -1171,7 +1198,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if (rangeOfCurrentParagraph.length != 0 && !(previousParagraphHasBullet && [self.latestReplacementString isEqualToString:@"\n"])) {
 		return;
     }
-    if (!self.justDeletedBackward && [[self.attributedString.string substringFromIndex:rangeOfPreviousParagraph.location] hasPrefix:self.BULLET_STRING]) {
+    if (!self.justDeletedBackward && [[self.string substringFromIndex:rangeOfPreviousParagraph.location] hasPrefix:self.BULLET_STRING]) {
         [self userSelectedBullet];
     }
 }
@@ -1197,9 +1224,9 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         }
         //else return;
         NSUInteger checkStringLength = [checkString length];
-        if (![self.attributedString.string isEqualToString:self.BULLET_STRING]) {
+        if (![self.string isEqualToString:self.BULLET_STRING]) {
             if (((int)(range.location-checkStringLength) >= 0 &&
-                 [[self.attributedString.string substringFromIndex:range.location-checkStringLength] hasPrefix:checkString])) {
+                 [[self.string substringFromIndex:range.location-checkStringLength] hasPrefix:checkString])) {
                 [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
                 //NSLog(@"[RTE] Getting rid of a bullet due to backspace while in empty bullet paragraph.");
                 // Get rid of bullet string
@@ -1213,7 +1240,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             else {
                 // User may be needing to get out of a bulleted list due to hitting enter (return)
                 NSRange rangeOfCurrentParagraph = [self.attributedString firstParagraphRangeFromTextRange:self.selectedRange];
-                NSString *currentParagraphString = [self.attributedString.string substringWithRange:rangeOfCurrentParagraph];
+                NSString *currentParagraphString = [self.string substringWithRange:rangeOfCurrentParagraph];
                 NSInteger prevParaLocation = rangeOfCurrentParagraph.location-1;
                 // [currentParagraphString isEqualToString:self.BULLET_STRING] ==> "is the current paragraph an empty bulleted list item?"
                 if (prevParaLocation >= 0 && [currentParagraphString isEqualToString:self.BULLET_STRING]) {
@@ -1221,7 +1248,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
                     // If the following if statement is true, the user hit enter on a blank bullet list
                     // Basically, there is now a bullet ' ' \n bullet ' ' that we need to delete (' ' == space)
                     // Since it gets here AFTER it adds a new bullet
-                    if ([[self.attributedString.string substringWithRange:rangeOfPreviousParagraph] hasSuffix:self.BULLET_STRING]) {
+                    if ([[self.string substringWithRange:rangeOfPreviousParagraph] hasSuffix:self.BULLET_STRING]) {
                         [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeBullet];
                         //NSLog(@"[RTE] Getting rid of bullets due to user hitting enter.");
                         NSRange rangeToDelete = NSMakeRange(rangeOfPreviousParagraph.location, rangeOfPreviousParagraph.length+rangeOfCurrentParagraph.length+1);
