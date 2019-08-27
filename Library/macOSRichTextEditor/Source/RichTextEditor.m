@@ -1131,7 +1131,12 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
             }
         }
     }
-    
+    if (currentRange.location > self.string.length || currentRange.location + currentRange.length > self.string.length) {
+        // select the very end of the string.
+        // there was a crash report that had an out of range error. Couldn't replicate, so trying
+        // to avoid future crashes.
+        return NSMakeRange(self.string.length, 0);
+    }
     NSRange endingStringRange = [[self.string substringWithRange:currentRange] rangeOfString:@"\n\u2022" options:NSBackwardsSearch];
     NSUInteger currentRangeAddedProperties = currentRange.location + currentRange.length;
     NSUInteger previousRangeAddedProperties = previousRange.location + previousRange.length;
