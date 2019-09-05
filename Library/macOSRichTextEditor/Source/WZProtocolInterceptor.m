@@ -12,7 +12,7 @@ static inline BOOL selector_belongsToProtocol(SEL selector, Protocol * protocol)
 
 @implementation WZProtocolInterceptor
 - (id)forwardingTargetForSelector:(SEL)aSelector {
-    if ([self.middleMan respondsToSelector:aSelector] &&
+    if (self.middleMan && [self.middleMan respondsToSelector:aSelector] &&
         [self isSelectorContainedInInterceptedProtocols:aSelector]) {
         return self.middleMan;
     }
@@ -25,12 +25,12 @@ static inline BOOL selector_belongsToProtocol(SEL selector, Protocol * protocol)
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-    if ([self.middleMan respondsToSelector:aSelector] &&
+    if (self.middleMan && [self.middleMan respondsToSelector:aSelector] &&
         [self isSelectorContainedInInterceptedProtocols:aSelector]) {
         return YES;
     }
     
-    if ([self.receiver respondsToSelector:aSelector]) {
+    if (self.receiver && [self.receiver respondsToSelector:aSelector]) {
         return YES;
     }
     
