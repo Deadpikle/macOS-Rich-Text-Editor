@@ -103,7 +103,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 }
 
 - (id)delegate {
-    return self.delegate_interceptor.receiver;
+    return self.delegate_interceptor;
 }
 
 - (void)setDelegate:(id)newDelegate {
@@ -181,16 +181,16 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if ([replacementString isEqualToString:@" "]) {
         [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeSpace];
     }
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
-        return [self.delegate textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
+        return [self.delegate_interceptor.receiver textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
     }
     return YES;
 }
 
 // http://stackoverflow.com/questions/2484072/how-can-i-make-the-tab-key-move-focus-out-of-a-nstextview
 - (BOOL)textView:(NSTextView *)aTextView doCommandBySelector:(SEL)aSelector {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:doCommandBySelector:)]) {
-        return [self.delegate textView:aTextView doCommandBySelector:aSelector];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textView:doCommandBySelector:)]) {
+        return [self.delegate_interceptor.receiver textView:aTextView doCommandBySelector:aSelector];
     }
     if (aSelector == @selector(insertTab:)) {
         if ([self isInEmptyBulletedListItem]) {
@@ -281,8 +281,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         newSelectedCharRange = [self adjustSelectedRangeForBulletsWithStart:rangeOfCurrentParagraph Previous:oldSelectedCharRange andCurrent:newSelectedCharRange isMouseClick:NO];
     }
     
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
-        return [self.delegate textView:textView willChangeSelectionFromCharacterRange:oldSelectedCharRange toCharacterRange:newSelectedCharRange];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textView:willChangeSelectionFromCharacterRange:toCharacterRange:)]) {
+        return [self.delegate_interceptor.receiver textView:textView willChangeSelectionFromCharacterRange:oldSelectedCharRange toCharacterRange:newSelectedCharRange];
     }
     return newSelectedCharRange;
 }
@@ -291,8 +291,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     [self setNeedsLayout:YES];
     [self scrollRangeToVisible:self.selectedRange]; // fixes issue with cursor moving to top via keyboard and RTE not scrolling
     [self sendDelegateTypingAttrsUpdate];
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textViewDidChangeSelection:)]) {
-        [self.delegate textViewDidChangeSelection:notification];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textViewDidChangeSelection:)]) {
+        [self.delegate_interceptor.receiver textViewDidChangeSelection:notification];
     }
 }
 
@@ -319,8 +319,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         self.isInTextDidChange = NO;
     }
     self.justDeletedBackward = NO;
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)]) {
-        [self.delegate textDidChange:notification];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textDidChange:)]) {
+        [self.delegate_interceptor.receiver textDidChange:notification];
     }
 }
 
@@ -399,8 +399,8 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 }
 
 -(void)sendDelegateTVChanged {
-    if (self.delegate && [self.delegate respondsToSelector:@selector(textDidChange:)]) {
-        [self.delegate textDidChange:[NSNotification notificationWithName:@"textDidChange:" object:self]];
+    if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textDidChange:)]) {
+        [self.delegate_interceptor.receiver textDidChange:[NSNotification notificationWithName:@"textDidChange:" object:self]];
     }
 }
 
