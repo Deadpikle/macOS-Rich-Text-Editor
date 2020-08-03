@@ -33,17 +33,35 @@
 @implementation NSFont (RichTextEditor)
 
 + (NSString *)postscriptNameFromFullName:(NSString *)fullName {
-	NSFont *font = [NSFont fontWithName:fullName size:1];
+    // avoid error with "All system UI font access should be through proper APIs..."
+    // by bailing early if the user gets here with a system font
+    if ([fullName containsString:@"SFNS"]) {
+        return fullName;
+    }
+    NSFont *font = [NSFont fontWithName:fullName size:1];
 	return (__bridge NSString *)(CTFontCopyPostScriptName((__bridge CTFontRef)(font)));
 }
 
 + (NSFont *)fontWithName:(NSString *)name size:(CGFloat)size boldTrait:(BOOL)isBold italicTrait:(BOOL)isItalic {
-	NSString *postScriptName = [NSFont postscriptNameFromFullName:name];
-	
-	CTFontSymbolicTraits traits = 0;
-	CTFontRef newFontRef;
+    // avoid error with "All system UI font access should be through proper APIs..."
+    // by bailing early if the user gets here with a system font
+    if ([name containsString:@"SFNS"]) {
+        NSFontManager *fontManager = [NSFontManager sharedFontManager];
+        NSFont *sysFont = [NSFont systemFontOfSize:size];
+        if (isItalic) {
+            sysFont = [fontManager convertFont:sysFont toHaveTrait:NSFontItalicTrait];
+        }
+        if (isBold) {
+            sysFont = [fontManager convertFont:sysFont toHaveTrait:NSFontBoldTrait];
+        }
+        return sysFont;
+    }
+    NSString *postScriptName = [NSFont postscriptNameFromFullName:name];
+    
 	CTFontRef fontWithoutTrait = CTFontCreateWithName((__bridge CFStringRef)(postScriptName), size, NULL);
-	
+    CTFontSymbolicTraits traits = 0;
+    CTFontRef newFontRef;
+    
     if (isItalic) {
         traits |= kCTFontItalicTrait;
     }
@@ -53,7 +71,7 @@
     }
 	
 	if (traits == 0) {
-		newFontRef= CTFontCreateCopyWithAttributes(fontWithoutTrait, 0.0, NULL, NULL);
+		newFontRef = CTFontCreateCopyWithAttributes(fontWithoutTrait, 0.0, NULL, NULL);
 	}
 	else {
 		newFontRef = CTFontCreateCopyWithSymbolicTraits(fontWithoutTrait, 0.0, NULL, traits, traits);
