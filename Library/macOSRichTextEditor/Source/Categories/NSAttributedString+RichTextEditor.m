@@ -96,7 +96,7 @@
 	NSArray *paragraphRanges = [self rangeOfParagraphsFromTextRange:NSMakeRange(0, self.string.length-1)];
 	
 	for (int i = 0; i < paragraphRanges.count; i++) {
-		NSValue *value = [paragraphRanges objectAtIndex:i];
+		NSValue *value = paragraphRanges[i];
 		NSRange range = [value rangeValue];
 		NSDictionary *paragraphDictionary = [self attributesAtIndex:range.location effectiveRange:nil];
 		NSParagraphStyle *paragraphStyle = [paragraphDictionary objectForKey:NSParagraphStyleAttributeName];

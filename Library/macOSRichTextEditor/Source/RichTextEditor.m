@@ -851,7 +851,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 	NSArray *rangeOfParagraphsInSelectedText = [self.attributedString rangeOfParagraphsFromTextRange:self.selectedRange];
 	
 	for (int i = 0; i < rangeOfParagraphsInSelectedText.count; i++) {
-		NSValue *value = [rangeOfParagraphsInSelectedText objectAtIndex:i];
+		NSValue *value = rangeOfParagraphsInSelectedText[i];
 		NSRange paragraphRange = [value rangeValue];
 		block(paragraphRange);
 	}
@@ -869,7 +869,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
 		return NSMakeRange(0, 0);
     }
 	
-	NSRange firstRange = [[paragraphRanges objectAtIndex:0] rangeValue];
+	NSRange firstRange = [paragraphRanges[0] rangeValue];
 	NSRange lastRange = [[paragraphRanges lastObject] rangeValue];
 	return NSMakeRange(firstRange.location, lastRange.location + lastRange.length - firstRange.location);
 }
@@ -895,7 +895,7 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     // http://stackoverflow.com/questions/11835497/nstextview-not-applying-attributes-to-newly-inserted-text
     NSArray *selectedRanges = self.selectedRanges;
     if (selectedRanges && selectedRanges.count > 0 && [self hasText]) {
-        NSValue *firstSelectionRangeValue = [selectedRanges objectAtIndex:0];
+        NSValue *firstSelectionRangeValue = selectedRanges[0];
         if (firstSelectionRangeValue) {
             NSRange firstCharacterOfSelectedRange = [firstSelectionRangeValue rangeValue];
             if (firstCharacterOfSelectedRange.location >= self.textStorage.length) {
