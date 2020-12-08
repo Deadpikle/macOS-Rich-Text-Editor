@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
+<document type="com.apple.InterfaceBuilder3.Cocoa.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" initialViewController="B8D-0N-5wS">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="17506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -619,7 +620,7 @@
                                         <menuItem title="Show Sidebar" keyEquivalent="s" id="kIP-vf-haE">
                                             <modifierMask key="keyEquivalentModifierMask" control="YES" command="YES"/>
                                             <connections>
-                                                <action selector="toggleSourceList:" target="Ady-hI-5gd" id="iwa-gc-5KM"/>
+                                                <action selector="toggleSidebar:" target="Ady-hI-5gd" id="iwa-gc-5KM"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem title="Enter Full Screen" keyEquivalent="f" id="4J7-dP-txa">
@@ -684,7 +685,7 @@
         <scene sceneID="R2V-B0-nI4">
             <objects>
                 <windowController id="B8D-0N-5wS" sceneMemberID="viewController">
-                    <window key="window" title="macOS Rich Text Editor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
+                    <window key="window" title="macOS Rich Text Editor" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" visibleAtLaunch="NO" animationBehavior="default" id="IQv-IB-iLA">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="196" y="240" width="480" height="270"/>
@@ -719,17 +720,17 @@
                                 </textFieldCell>
                             </textField>
                             <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PhS-1d-JEf">
-                                <rect key="frame" x="0.0" y="0.0" width="640" height="412"/>
-                                <clipView key="contentView" id="bEQ-mC-V9I">
-                                    <rect key="frame" x="1" y="1" width="623" height="410"/>
+                                <rect key="frame" x="0.0" y="0.0" width="640" height="380"/>
+                                <clipView key="contentView" drawsBackground="NO" id="bEQ-mC-V9I">
+                                    <rect key="frame" x="1" y="1" width="623" height="378"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView importsGraphics="NO" verticallyResizable="YES" baseWritingDirection="leftToRight" usesFontPanel="YES" findStyle="panel" continuousSpellChecking="YES" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="756-Yc-7La" customClass="RichTextEditor">
-                                            <rect key="frame" x="0.0" y="0.0" width="623" height="410"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="623" height="378"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                            <size key="minSize" width="623" height="410"/>
+                                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <size key="minSize" width="623" height="378"/>
                                             <size key="maxSize" width="480623" height="10000000"/>
                                             <attributedString key="textStorage">
                                                 <fragment content="Lorem">
@@ -902,17 +903,16 @@
                                                     </attributes>
                                                 </fragment>
                                             </attributedString>
-                                            <color key="insertionPointColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                                            <color key="insertionPointColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                         </textView>
                                     </subviews>
-                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </clipView>
                                 <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="5CO-ui-Kgg">
                                     <rect key="frame" x="-100" y="-100" width="87" height="18"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                                 <scroller key="verticalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="R5B-sR-jY7">
-                                    <rect key="frame" x="624" y="1" width="15" height="410"/>
+                                    <rect key="frame" x="624" y="1" width="15" height="378"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </scroller>
                             </scrollView>
@@ -1026,13 +1026,23 @@
                                 </connections>
                             </colorWell>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="UY9-XX-bWP">
-                                <rect key="frame" x="535" y="443" width="32" height="17"/>
+                                <rect key="frame" x="535" y="443" width="32" height="16"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Font" id="04W-Kw-2f1">
                                     <font key="font" metaFont="system"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Kfg-Dd-HdJ">
+                                <rect key="frame" x="6" y="390" width="321" height="18"/>
+                                <buttonCell key="cell" type="check" title="Tab key always indents/shift+tab always outdents" bezelStyle="regularSquare" imagePosition="left" inset="2" id="kDg-4G-5yu">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="tabAlwaysIndentsChecked:" target="XfG-lQ-9wD" id="XOU-ha-ezR"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="UY9-XX-bWP" firstAttribute="leading" secondItem="1iq-kC-lvF" secondAttribute="leading" id="0iU-xq-rXA"/>
@@ -1042,7 +1052,7 @@
                             <constraint firstItem="wyN-Sw-Yo0" firstAttribute="centerY" secondItem="kNB-8o-LKu" secondAttribute="centerY" id="JS1-4M-Th1"/>
                             <constraint firstItem="5Cg-eh-gtb" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="41" id="O7E-y6-AqK"/>
                             <constraint firstAttribute="bottom" secondItem="PhS-1d-JEf" secondAttribute="bottom" id="OON-Gh-jzk"/>
-                            <constraint firstItem="PhS-1d-JEf" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="68" id="P5e-bk-1PU"/>
+                            <constraint firstItem="PhS-1d-JEf" firstAttribute="top" secondItem="m2S-Jp-Qdl" secondAttribute="top" constant="100" id="P5e-bk-1PU"/>
                             <constraint firstItem="xXM-qv-AHk" firstAttribute="centerY" secondItem="hpW-8d-S0N" secondAttribute="centerY" id="PRi-UG-M6j"/>
                             <constraint firstAttribute="trailing" secondItem="PhS-1d-JEf" secondAttribute="trailing" id="Pbn-cf-xEf"/>
                             <constraint firstItem="hpW-8d-S0N" firstAttribute="centerY" secondItem="rvS-Wc-qH0" secondAttribute="centerY" id="R8u-J1-Baf"/>
@@ -1050,6 +1060,7 @@
                             <constraint firstItem="5Cg-eh-gtb" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" constant="8" id="Tn4-Wz-eia"/>
                             <constraint firstItem="PhS-1d-JEf" firstAttribute="leading" secondItem="m2S-Jp-Qdl" secondAttribute="leading" id="ZGp-U8-t8e"/>
                             <constraint firstItem="G2e-lU-zjA" firstAttribute="centerX" secondItem="m2S-Jp-Qdl" secondAttribute="centerX" id="dnY-1l-jFS"/>
+                            <constraint firstItem="Kfg-Dd-HdJ" firstAttribute="leading" secondItem="5Cg-eh-gtb" secondAttribute="leading" id="fl4-7p-ydq"/>
                             <constraint firstItem="rvS-Wc-qH0" firstAttribute="leading" secondItem="wyN-Sw-Yo0" secondAttribute="trailing" constant="10" id="hjD-Yl-oEv"/>
                             <constraint firstItem="x5L-0P-Oih" firstAttribute="centerY" secondItem="xXM-qv-AHk" secondAttribute="centerY" id="iRv-YV-yfr"/>
                             <constraint firstItem="rvS-Wc-qH0" firstAttribute="centerY" secondItem="wyN-Sw-Yo0" secondAttribute="centerY" id="jbB-xR-4pu"/>
@@ -1058,6 +1069,7 @@
                             <constraint firstItem="wyN-Sw-Yo0" firstAttribute="leading" secondItem="kNB-8o-LKu" secondAttribute="trailing" constant="10" id="to2-OE-ol8"/>
                             <constraint firstItem="7cL-pi-vJL" firstAttribute="leading" secondItem="x5L-0P-Oih" secondAttribute="trailing" constant="6" id="u8V-k2-ZNJ"/>
                             <constraint firstItem="x5L-0P-Oih" firstAttribute="leading" secondItem="xXM-qv-AHk" secondAttribute="trailing" constant="10" id="ulL-5N-lwO"/>
+                            <constraint firstItem="Kfg-Dd-HdJ" firstAttribute="top" secondItem="5Cg-eh-gtb" secondAttribute="bottom" constant="12" id="uqY-U0-lpL"/>
                             <constraint firstItem="7cL-pi-vJL" firstAttribute="centerY" secondItem="x5L-0P-Oih" secondAttribute="centerY" id="vX6-XY-PYI"/>
                             <constraint firstItem="1iq-kC-lvF" firstAttribute="leading" secondItem="7cL-pi-vJL" secondAttribute="trailing" constant="10" id="wDW-nr-jnf"/>
                             <constraint firstItem="kNB-8o-LKu" firstAttribute="centerY" secondItem="5Cg-eh-gtb" secondAttribute="centerY" id="xWg-Mq-VUO"/>
@@ -1071,6 +1083,7 @@
                         <outlet property="increaseIndentButton" destination="xXM-qv-AHk" id="qqB-AZ-q4u"/>
                         <outlet property="italicButton" destination="kNB-8o-LKu" id="z87-NE-ebp"/>
                         <outlet property="richTextEditor" destination="756-Yc-7La" id="g8X-Ep-aEK"/>
+                        <outlet property="tabKeyAlwaysIndentsButton" destination="Kfg-Dd-HdJ" id="0QE-L2-8mN"/>
                         <outlet property="underlineButton" destination="wyN-Sw-Yo0" id="Z2F-xr-Qnw"/>
                     </connections>
                 </viewController>
@@ -1080,11 +1093,11 @@
         </scene>
     </scenes>
     <resources>
-        <image name="bold" width="48" height="48"/>
-        <image name="bulleted-list" width="48" height="48"/>
-        <image name="indent-decrease" width="48" height="48"/>
-        <image name="indent-increase" width="48" height="48"/>
-        <image name="italic" width="48" height="48"/>
-        <image name="underline" width="48" height="48"/>
+        <image name="bold" width="24" height="24"/>
+        <image name="bulleted-list" width="24" height="24"/>
+        <image name="indent-decrease" width="24" height="24"/>
+        <image name="indent-increase" width="24" height="24"/>
+        <image name="italic" width="24" height="24"/>
+        <image name="underline" width="24" height="24"/>
     </resources>
 </document>

@@ -44,6 +44,7 @@
 @property (weak) IBOutlet NSButton *increaseIndentButton;
 @property (weak) IBOutlet NSColorWell *fontColorWell;
 @property (weak) IBOutlet NSColorWell *highlightColorWell;
+@property (weak) IBOutlet NSButton *tabKeyAlwaysIndentsButton;
 
 -(IBAction)toggleBold:(id)sender;
 -(IBAction)toggleItalic:(id)sender;
@@ -59,6 +60,8 @@
 
 - (IBAction)fontColorChanged:(id)sender;
 - (IBAction)highlightColorChanged:(id)sender;
+
+- (IBAction)tabAlwaysIndentsChecked:(id)sender;
 
 @end
 
@@ -139,6 +142,10 @@
         self.bulletedListButton.image = [[NSImage imageNamed:@"bulleted-list"] imageTintedWithColor:NSColor.blackColor];
     }
     self.fontColorWell.color = textColor;
+}
+
+- (IBAction)tabAlwaysIndentsChecked:(id)sender {
+    self.richTextEditor.tabKeyAlwaysIndentsOutdents = self.tabKeyAlwaysIndentsButton.state == NSOnState;
 }
 
 @end
