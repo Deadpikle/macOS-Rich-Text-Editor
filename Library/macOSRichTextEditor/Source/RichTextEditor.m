@@ -184,6 +184,10 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
     if (self.delegate_interceptor.receiver && [self.delegate_interceptor.receiver respondsToSelector:@selector(textView:shouldChangeTextInRange:replacementString:)]) {
         return [self.delegate_interceptor.receiver textView:textView shouldChangeTextInRange:affectedCharRange replacementString:replacementString];
     }
+    if (self.tabKeyAlwaysIndentsOutdents && [replacementString isEqualToString:@"\t"] && affectedCharRange.length == 0) {
+        //[self userSelectedIncreaseIndent];
+        //return NO;
+    }
     return YES;
 }
 
@@ -1391,6 +1395,14 @@ typedef NS_ENUM(NSInteger, ParagraphIndentation) {
         else if (keyChar == 't' && commandKeyDown && !shiftKeyDown &&
                  (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutIncreaseIndent)) {
             [self userSelectedIncreaseIndent];
+        }
+        else if (self.tabKeyAlwaysIndentsOutdents && keyChar == '\t' && !commandKeyDown && !shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutIncreaseIndent)) {
+            [self userSelectedIncreaseIndent];
+        }
+        else if (self.tabKeyAlwaysIndentsOutdents && (keyChar == '\t' || keyChar == 25) && !commandKeyDown && shiftKeyDown &&
+                 (enabledShortcuts == RichTextEditorShortcutAll || enabledShortcuts & RichTextEditorShortcutIncreaseIndent)) {
+            [self userSelectedDecreaseIndent];
         }
         else if (!([self.rteDelegate respondsToSelector:@selector(richTextEditor:keyDownEvent:)] && [self.rteDelegate richTextEditor:self keyDownEvent:event])) {
             [self sendDelegatePreviewChangeOfType:RichTextEditorPreviewChangeKeyDown];

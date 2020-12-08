@@ -129,6 +129,10 @@ typedef NS_OPTIONS(NSUInteger, RichTextEditorShortcut) {
 /// Minimum font size. Defaults to 10.0f.
 @property CGFloat minFontSize;
 
+/// true if tab should always indent and shift+tab should always outdent the current paragraph(s);
+/// false to let the tab key be used as normal
+@property BOOL tabKeyAlwaysIndentsOutdents;
+
 /// Pasteboard type string used when copying text from this NSTextView.
 +(NSString*)pasteboardDataType;
 
